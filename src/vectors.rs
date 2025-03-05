@@ -13,7 +13,7 @@ impl Vector {
         }
 	}
 
-    fn add (&self, other: Vector) -> Vector {
+    fn Add (&self, other: Vector) -> Vector {
         Vector {
             x: self.x + other.x,
             y: self.y + other.y,
@@ -21,7 +21,7 @@ impl Vector {
         }
     }
 
-    fn sub (&self, other: Vector) -> Vector {
+    fn Sub (&self, other: Vector) -> Vector {
         Vector {
             x: self.x - other.x,
             y: self.y - other.y,
