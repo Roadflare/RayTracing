@@ -24,7 +24,7 @@ Examples:
 - MacOS: `brew install sdl2`
 - Windows (MSVC):
 
-1. Download MSVC development libraries from http://www.libsdl.org/ (SDL2-devel-2.0.x-VC.zip).
+1. Download MSVC development libraries from http://www.libsdl.org/ (SDL2-devel-2.0.x-VC.zip). (Note: version of SDL2 must be 2.28.x or newer else it wont work)
 2. Unpack SDL2-devel-2.0.x-VC.zip to a folder of your choosing (You can delete it afterwards).
 3. Copy all lib files from
     > SDL2-devel-2.0.x-VC\SDL2-2.0.x\lib\x64\
