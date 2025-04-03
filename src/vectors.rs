@@ -1,11 +1,12 @@
-struct Vector {
-	x: f64,
-	y: f64,
-	z: f64
+#[derive(Debug, Copy, Clone)]
+pub struct Vector {
+	pub x: f64,
+	pub y: f64,
+	pub z: f64
 }
 
-impl Vector {
-	fn make (x_in: f64, y_in: f64, z_in: f64) -> Self {
+ impl Vector {
+	pub fn make (x_in: f64, y_in: f64, z_in: f64) -> Self {
 		Vector {
             x: x_in,
             y: y_in,
@@ -56,4 +57,13 @@ impl Vector {
             z: self.x * other.y - self.y * other.x,
         }
     }
+
+    //projecira tako da kamera vidi. pozicije kamere se še ne da spreminjati(potrebna implementacija)
+    pub fn project(v: &Self, width: f64, height: f64, fov: f64) -> (i32, i32) {
+        let scale = fov / (fov + v.z);
+        let x_proj = v.x * scale + width / 2.0;
+        let y_proj = v.y * scale + height / 2.0;
+        (x_proj as i32, y_proj as i32)
+    }
 }
+
