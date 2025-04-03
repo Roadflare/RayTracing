@@ -1,5 +1,6 @@
 extern crate sdl2;
 mod vectors;
+use sdl2::keyboard::Keycode;
 use vectors::Vector;
 use sdl2::event::Event;
 use sdl2::pixels::Color;
@@ -41,17 +42,22 @@ fn main() {
     'running: loop {
         // Handle events
         for event in event_pump.poll_iter() {
-            if let Event::Quit { .. } = event {
-                break 'running;
+            match event {
+                Event::Quit { .. } | 
+                Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                    break 'running
+                }
+                /*Event::KeyDown {keycode: Some(Keycode::X), .. } => {
+                    canvas.set_draw_color(Color::RGB(0, 255, 255));
+                    canvas.present();
+                }*/
+                _ => {}
             }
         }
 
         // Background
         draw_gradient_background(&mut canvas, 800, 600);
         // Tukaj narišemo oblike s pomočjo funkcij definiranih da rišejo na canvas(glejta v test.rs)
-
-        //
-
 
         // Present the rendered frame
         canvas.present();
