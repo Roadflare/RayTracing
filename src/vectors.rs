@@ -78,7 +78,7 @@ impl Sub for Vector {
 }
 
 impl Mul<f64> for Vector {
-    type Output = Self;
+    type Output = Vector;
 
     fn mul(self, other: f64) -> Self {
         Self {
