@@ -1,3 +1,5 @@
+use std::ops::{Add, Sub};
+
 #[derive(Debug, Copy, Clone)]
 pub struct Vector {
 	pub x: f64,
@@ -13,22 +15,6 @@ pub struct Vector {
             z: z_in
         }
 	}
-
-    fn Add (&self, other: Vector) -> Vector {
-        Vector {
-            x: self.x + other.x,
-            y: self.y + other.y,
-            z: self.z + other.z
-        }
-    }
-
-    fn Sub (&self, other: Vector) -> Vector {
-        Vector {
-            x: self.x - other.x,
-            y: self.y - other.y,
-            z: self.z - other.z
-        }
-    }
 
     fn length (&self) -> f64 {
         return f64::sqrt(self.x.powi(2) + self.y.powi(2) + self.z.powi(2));
@@ -67,3 +53,26 @@ pub struct Vector {
     }
 }
 
+impl Add for Vector {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self::Output {
+        Self {
+        x: self.x + other.x,
+        y: self.y + other.y,
+        z: self.z + other.z
+        }
+    }
+}
+
+impl Sub for Vector {
+    type Output =  Self;
+
+    fn sub(self, other: Self) -> Self::Output {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z
+        }
+    }
+}
