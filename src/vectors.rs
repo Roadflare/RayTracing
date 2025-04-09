@@ -20,7 +20,7 @@ pub struct Vector {
         return f64::sqrt(self.x.powi(2) + self.y.powi(2) + self.z.powi(2));
     }
 
-    fn norm (self: &mut Vector) -> Vector {
+    pub fn norm (self: &Vector) -> Vector {
         let length = self.length();
         if length == 0.0 {
             panic!("Zero Length!");
@@ -32,11 +32,11 @@ pub struct Vector {
         }
     }
 
-    fn dot(&self, other: &Vector) -> f64 {
+    pub fn dot(&self, other: &Vector) -> f64 {
         return self.x * other.x + self.y * other.y + self.z * other.z;
     }
 
-    fn cross(self, other: Vector) -> Vector {
+    pub fn cross(&self, other: &Vector) -> Vector {
         Vector {
             x: self.y * other.z - self.z * other.y,
             y: self.z * other.x - self.x * other.z,
