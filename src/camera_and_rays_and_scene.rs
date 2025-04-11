@@ -21,10 +21,11 @@ impl Camera {
         width: u16,
         ratio: (u16, u16),
     ) {
-        let up = Vector { x: 0.0, y: 1.0, z: 0.0 };
         let forward = self.direction;
-        let right = forward.cross(&up).norm();
-        let true_up = right.cross(&forward).norm();
+        let right = if forward.x == 0. && forward.z == 0.
+            { Vector {x: 1., y: 0., z: 0. } } else
+            { forward.cross(&Vector { x: 0.0, y: 1.0, z: 0.0 }).norm() };
+        let up = right.cross(&forward).norm();
 
         let (x_ratio, y_ratio) = ratio;
         let height = (width as f64 * (y_ratio as f64 / x_ratio as f64)) as u16;
@@ -37,7 +38,7 @@ impl Camera {
 
                 let pixel_dir = forward
                     + right * (u * 2.0 * aspect_ratio)
-                    + true_up * (-v * 2.0);
+                    + up * (-v * 2.0);
 
                 let ray = Ray::new(self.coords, pixel_dir);
 
