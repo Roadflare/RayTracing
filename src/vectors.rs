@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Mul};
+use std::ops::{Add, Sub, Mul, Div};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vector {
@@ -8,7 +8,7 @@ pub struct Vector {
 }
 
  impl Vector {
-	pub fn make (x_in: f64, y_in: f64, z_in: f64) -> Self {
+	pub fn make(x_in: f64, y_in: f64, z_in: f64) -> Self {
 		Vector {
             x: x_in,
             y: y_in,
@@ -16,11 +16,11 @@ pub struct Vector {
         }
 	}
 
-    fn length (&self) -> f64 {
+    pub fn length(&self) -> f64 {
         return f64::sqrt(self.x.powi(2) + self.y.powi(2) + self.z.powi(2));
     }
 
-    pub fn norm (self: &Vector) -> Vector {
+    pub fn normalized(self: &Vector) -> Vector {
         let length = self.length();
         if length == 0.0 {
             panic!("Zero Length!");
@@ -98,5 +98,13 @@ impl Mul<Vector> for f64 {
             y: self * other.y,
             z: self * other.z
         }
+    }
+}
+
+impl Div<f64> for Vector {
+    type Output = Vector;
+
+    fn div(self, other: f64) -> Self{
+        self * (1. / other)
     }
 }
