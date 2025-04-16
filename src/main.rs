@@ -1,5 +1,5 @@
 extern crate sdl2;
-use scene::{Scene, Sphere};
+use scene::{Scene, Sphere, Material, ColorType, Light};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -28,6 +28,7 @@ fn main() -> Result<(), String> {
         .map_err(|e| e.to_string())?;
     let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
 
+
     let scene = Scene {
         spheres: vec![Sphere {
             center: Vector {
@@ -36,7 +37,16 @@ fn main() -> Result<(), String> {
                 z: 3.0,
             },
             radius: 1.0,
+            material: Material {
+                color: ColorType::Solid(Color::RGB(111,111,111)),
+            },
         }],
+        lights: vec![
+        Light {
+            position: Vector::make(1.0, -1.0, -1.0),
+            intensity: 1.0,
+        },
+    ],
     };
     //definiramo kamero
     let camera = Camera::new(

@@ -8,12 +8,10 @@ pub struct Ray {
     pub direction: Vector,
 }
 
-
 pub struct Camera {
     pub coords: Vector,
     pub direction: Vector,
 }
-
 
 impl Ray {
     fn new(origin: Vector, direction: Vector) -> Self {
@@ -23,7 +21,6 @@ impl Ray {
         }
     }
 }
-
 
 impl Camera {
     pub fn new(coords: Vector, direction: Vector) -> Self {
@@ -40,7 +37,7 @@ impl Camera {
         width: u16,
         ratio: (u16, u16),
     ) {
-        let up = Vector { x: 0.0, y: 1.0, z: 0.0 };
+        let up = Vector::make(0.0, 1.0, 0.0);
         let forward = self.direction;
         let right = forward.cross(&up).normalized();
         let true_up = right.cross(&forward).normalized();
@@ -54,21 +51,31 @@ impl Camera {
                 let u = (x as f64 + 0.5) / width as f64 - 0.5;
                 let v = (y as f64 + 0.5) / height as f64 - 0.5;
 
-                let pixel_dir = forward
-                    + right * (u * 2.0 * aspect_ratio)
-                    + true_up * (-v * 2.0);
+                let pixel_dir = forward + right * (u * 2.0 * aspect_ratio) + true_up * (-v * 2.0);
 
                 let ray = Ray::new(self.coords, pixel_dir);
-                let color: Color;
-                match scene.trace_ray(&ray) {
-                    Option::None => {
-                        color = Color::RGB(150, 170, 150 + (y as f64 * 105. / height as f64) as u8)
+
+                let color = if let Some((sphere, point)) = scene.trace_ray(&ray) {
+                    let normal = sphere.normal(point);
+
+                    let mut brightness = 0.0;
+
+                    for light in &scene.lights {
+                        let light_dir = (light.position - point).normalized();
+                        let dot = normal.dot(&light_dir).max(0.0);
+                        brightness += dot * light.intensity;
                     }
-                    Some((sphere, point)) => {
-                        let n = sphere.normal(point) * 255.;
-                        color = Color::RGB((n.x / 2. + 0.5) as u8, (n.y * 2.) as u8, (n.z / 2. + 1.) as u8)
-                    }
-                }
+
+                    brightness = brightness.min(1.0);
+
+                    let r = (255.0 * brightness) as u8;
+                    let g = (30.0 * brightness) as u8;
+                    let b = (30.0 * brightness) as u8;
+
+                    Color::RGB(r, g, b)
+                } else {
+                    Color::RGB(150, 170, 150 + (y as f64 * 105. / height as f64) as u8)
+                };
 
                 canvas.set_draw_color(color);
                 let _ = canvas.draw_point(sdl2::rect::Point::new(x as i32, y as i32));

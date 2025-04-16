@@ -1,8 +1,10 @@
 use crate::vectors::Vector;
 use crate::camera::Ray;
+use sdl2::pixels::Color;
 
 pub struct Scene {
     pub spheres: Vec<Sphere>,
+    pub lights: Vec<Light>,
 }
 
 impl Scene {
@@ -18,10 +20,19 @@ impl Scene {
         else { Some((closest.1, closest.2))}
     }
 }
+pub enum ColorType {
+    Solid(Color),
+    Function(fn(Vector) -> Color),//skalarno polje za barvo
+}
+
+pub struct Material {
+    pub color: ColorType,
+}
 
 pub struct Sphere {
     pub center: Vector,
     pub radius: f64,
+    pub material: Material,
 }
 
 impl Sphere {
@@ -38,4 +49,9 @@ impl Sphere {
     pub fn normal(&self, point: Vector) -> Vector {
         (point - self.center) / self.radius
     }
+}
+
+pub struct Light {
+    pub position: Vector,
+    pub intensity: f64, // od 0.0 do 1.0
 }
