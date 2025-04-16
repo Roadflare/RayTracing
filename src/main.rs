@@ -1,12 +1,17 @@
 extern crate sdl2;
-mod vectors;
+use scene::{Scene, Sphere};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use std::time::Duration;
+
+mod vectors;
 use vectors::Vector;
-mod camera_and_rays_and_scene;
-use camera_and_rays_and_scene::{Camera, Scene, Sphere};
+
+mod scene;
+
+mod camera;
+use camera::Camera;
 
 const WIDTH: u16 = 1400;
 const RATIO: (u16, u16) = (16, 10);
