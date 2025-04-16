@@ -34,11 +34,11 @@ fn main() -> Result<(), String> {
             center: Vector {
                 x: 0.0,
                 y: 0.0,
-                z: 3.0,
+                z: 0.0,
             },
             radius: 1.0,
             material: Material {
-                color: ColorType::Solid(Color::RGB(111,111,111)),
+                color: ColorType::Solid(Color::RGB(0,255,0)),
             },
         }],
         lights: vec![
@@ -53,12 +53,12 @@ fn main() -> Result<(), String> {
         Vector {
             x: 0.0,
             y: 0.0,
-            z: 0.0,
+            z: -3.0,
         },
         Vector {
             x: 0.0,
             y: 0.0,
-            z: 1.0,
+            z: 3.0,
         },
     );
 

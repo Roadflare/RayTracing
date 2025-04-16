@@ -1,7 +1,7 @@
+use crate::ColorType;
+use crate::scene::Scene;
 use crate::vectors::Vector;
 use sdl2::pixels::Color;
-
-use crate::scene::Scene;
 
 pub struct Ray {
     pub origin: Vector,
@@ -59,18 +59,20 @@ impl Camera {
                     let normal = sphere.normal(point);
 
                     let mut brightness = 0.0;
-
                     for light in &scene.lights {
                         let light_dir = (light.position - point).normalized();
-                        let dot = normal.dot(&light_dir).max(0.0);
-                        brightness += dot * light.intensity;
+                        brightness += normal.dot(&light_dir).max(0.0) * light.intensity;
                     }
-
                     brightness = brightness.min(1.0);
 
-                    let r = (255.0 * brightness) as u8;
-                    let g = (30.0 * brightness) as u8;
-                    let b = (30.0 * brightness) as u8;
+                    let base_color = match &sphere.material.color {
+                        ColorType::Solid(c) => *c,
+                        ColorType::Function(f) => f(point),
+                    };
+
+                    let r = (base_color.r as f64 * brightness) as u8;
+                    let g = (base_color.g as f64 * brightness) as u8;
+                    let b = (base_color.b as f64 * brightness) as u8;
 
                     Color::RGB(r, g, b)
                 } else {
