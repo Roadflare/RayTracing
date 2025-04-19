@@ -50,22 +50,33 @@ impl Camera {
 
         for y_pixel_coordinate in 0..height {
             for x_pixel_coordinate in 0..width {
-                let u = (x_pixel_coordinate as f64 + 0.5) / width as f64 - 0.5;
+                let u = (x_pixel_coordinate as f64 + 0.5) / width as f64 - 0.5; // koordinate pikslov v rešetki
                 let v = (y_pixel_coordinate as f64 + 0.5) / height as f64 - 0.5;
 
-                let pixel_dir = cam_direction + right * (u * 2.0 * aspect_ratio) + true_up * (-v * 2.0);
+                let pixel_dir =
+                    cam_direction + right * (u * 2.0 * aspect_ratio) + true_up * (-v * 2.0);
 
                 let ray = Ray::new(self.coords, pixel_dir);
 
                 let color = if let Some((sphere, point)) = scene.trace_ray(&ray) {
                     let normal = sphere.normal(point);
 
-                    let mut brightness = 0.0;
+                    let mut brightness = scene.ambient_light;
+
                     for light in &scene.lights {
                         let light_dir = (light.position - point).normalized();
-                        brightness += normal.dot(&light_dir).max(0.0) * light.intensity;
+                        let shadow_ray = Ray::new(point + normal * 0.001, light_dir);
+
+                        let in_shadow = scene.trace_ray(&shadow_ray).is_some();
+
+                        if !in_shadow {
+                            let light_contrib = normal.dot(&light_dir).max(0.0) * light.intensity;
+                            brightness += light_contrib;
+                        }
                     }
-                    brightness = brightness.min(1.0);
+
+                    // Končna svetlost naj ne presega 1.0
+                    brightness = brightness.clamp(0.0, 1.0);
 
                     let base_color = match &sphere.material.color {
                         ColorType::Solid(c) => *c,
@@ -78,11 +89,18 @@ impl Camera {
 
                     Color::RGB(r, g, b)
                 } else {
-                    Color::RGB(150, 170, 150 + (y_pixel_coordinate as f64 * 105. / height as f64) as u8)
+                    Color::RGB(
+                        150,
+                        170,
+                        150 + (y_pixel_coordinate as f64 * 105. / height as f64) as u8,
+                    )
                 };
 
                 canvas.set_draw_color(color);
-                let _ = canvas.draw_point(sdl2::rect::Point::new(x_pixel_coordinate as i32, y_pixel_coordinate as i32));
+                let _ = canvas.draw_point(sdl2::rect::Point::new(
+                    x_pixel_coordinate as i32,
+                    y_pixel_coordinate as i32,
+                ));
             }
         }
     }

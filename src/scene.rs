@@ -5,6 +5,7 @@ use sdl2::pixels::Color;
 pub struct Scene {
     pub spheres: Vec<Sphere>,
     pub lights: Vec<Light>,
+    pub ambient_light: f64,
 }
 
 impl Scene {

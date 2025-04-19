@@ -7,7 +7,7 @@ mod vectors;
 use vectors::Vector;
 
 mod scene;
-use scene::{Scene, Sphere, Material, ColorType, Light};
+use scene::{ColorType, Light, Material, Scene, Sphere};
 
 mod camera;
 use camera::Camera;
@@ -27,7 +27,6 @@ fn main() -> Result<(), String> {
         .map_err(|e| e.to_string())?;
     let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
 
-
     let scene = Scene {
         spheres: vec![Sphere {
             center: Vector {
@@ -37,27 +36,37 @@ fn main() -> Result<(), String> {
             },
             radius: 1.0,
             material: Material {
-                color: ColorType::Solid(Color::RGB(255,255,0)),
+                color: ColorType::Solid(Color::RGB(255, 255, 0)),
+            },
+        },
+        Sphere {
+            center: Vector {
+                x: 0.0,
+                y: 0.0,
+                z: -2.0,
+            },
+            radius: 0.5,
+            material: Material {
+                color: ColorType::Solid(Color::RGB(255, 0, 0)),
             },
         }],
-        lights: vec![
-        Light {
-            position: Vector::make(0.0, 0.0, -3.0),
+        lights: vec![Light {
+            position: Vector::make(0.0, 0.0, -5.0),
             intensity: 1.0,
-        },
-    ],
+        }],
+        ambient_light: 0.0,
     };
 
     let camera = Camera::new(
         Vector {
-            x: 0.0,
+            x: -3.0,
             y: 0.0,
-            z: -3.0,
+            z: 0.0,
         },
         Vector {
-            x: 0.0,
+            x: 1.0,
             y: 0.0,
-            z: 1.0,
+            z: 0.0,
         },
     );
 
