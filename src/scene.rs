@@ -1,5 +1,5 @@
-use crate::vectors::Vector;
 use crate::camera::Ray;
+use crate::vectors::Vector;
 use sdl2::pixels::Color;
 
 pub struct Scene {
@@ -11,11 +11,11 @@ pub struct Scene {
 impl Scene {
     pub fn make(spheres: Vec<Sphere>, lights: Vec<Light>, ambient_light: f64) -> Scene {
         Scene {
-        spheres: spheres,
-        lights: lights,
-        ambient_light: ambient_light,
+            spheres: spheres,
+            lights: lights,
+            ambient_light: ambient_light,
+        }
     }
-}
 
     pub fn trace_ray(&self, ray: &Ray) -> Option<(&Sphere, Vector)> {
         let mut closest: (f64, &Sphere, Vector) = (-f64::INFINITY, &self.spheres[0], ray.origin);
@@ -25,13 +25,15 @@ impl Scene {
                 closest = (d, &sphere, ray.origin + ray.direction * d);
             }
         }
-        if closest.0 < 0. { return None }
+        if closest.0 < 0. {
+            return None;
+        }
         Some((closest.1, closest.2))
     }
 }
 pub enum ColorType {
     Solid(Color),
-    Function(fn(Vector) -> Color),//skalarno polje za barvo
+    Function(fn(Vector) -> Color), //skalarno polje za barvo
 }
 
 pub struct Material {
@@ -51,8 +53,11 @@ impl Sphere {
         let b = 2.0 * oc.dot(&ray.direction);
         let c = oc.dot(&oc) - self.radius * self.radius;
         let discriminant: f64 = b * b - 4.0 * a * c;
-        if discriminant < 0. { -f64::INFINITY }
-        else { (-b - discriminant.powf(0.5)) / (2. * a) }
+        if discriminant < 0. {
+            -f64::INFINITY
+        } else {
+            (-b - discriminant.powf(0.5)) / (2. * a)
+        }
     }
 
     pub fn normal(&self, point: Vector) -> Vector {

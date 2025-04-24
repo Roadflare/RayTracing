@@ -14,15 +14,10 @@ use camera::Camera;
 
 mod tests;
 
-
 const WIDTH: u16 = 1400;
 const ASPECT_RATIO: (u16, u16) = (16, 10);
 
-
 fn main() -> Result<(), String> {
-
-    
-
     let sdl_context = sdl2::init()?;
     let video = sdl_context.video()?;
     let (x_ratio, y_ratio) = ASPECT_RATIO;
@@ -34,37 +29,7 @@ fn main() -> Result<(), String> {
         .map_err(|e| e.to_string())?;
     let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
 
-    let scene = Scene {
-        spheres: vec![
-            Sphere {
-                center: Vector {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                },
-                radius: 1.0,
-                material: Material {
-                    color: ColorType::Solid(Color::RGB(255, 255, 0)),
-                },
-            },
-            Sphere {
-                center: Vector {
-                    x: 0.0,
-                    y: 0.0,
-                    z: -2.0,
-                },
-                radius: 0.5,
-                material: Material {
-                    color: ColorType::Solid(Color::RGB(255, 0, 0)),
-                },
-            },
-        ],
-        lights: vec![Light {
-            position: Vector::make(0.0, 0.0, -5.0),
-            intensity: 1.0,
-        }],
-        ambient_light: 0.3,
-    };
+    let scene = &tests::SCENE1;
 
     let camera = Camera::new(
         Vector {
@@ -93,20 +58,32 @@ fn main() -> Result<(), String> {
                 } => break 'running,
                 Event::KeyDown {
                     keycode: Some(Keycode::NUM_1),
-                     ..
-                } => tests::draw_placeholder(&tests::SCENE1),
+                    ..
+                } => {
+                    camera.draw(&mut canvas, &tests::SCENE1, WIDTH, ASPECT_RATIO);
+                    canvas.present();
+                }
                 Event::KeyDown {
                     keycode: Some(Keycode::NUM_2),
-                     ..
-                } => tests::draw_placeholder(&tests::SCENE2),
+                    ..
+                } => {
+                    camera.draw(&mut canvas, &tests::SCENE2, WIDTH, ASPECT_RATIO);
+                    canvas.present();
+                }
                 Event::KeyDown {
                     keycode: Some(Keycode::NUM_3),
-                     ..
-                } => tests::draw_placeholder(&tests::SCENE3),
+                    ..
+                } => {
+                    camera.draw(&mut canvas, &tests::SCENE3, WIDTH, ASPECT_RATIO);
+                    canvas.present();
+                }
                 Event::KeyDown {
                     keycode: Some(Keycode::NUM_4),
-                     ..
-                } => tests::draw_placeholder(&tests::SCENE4),
+                    ..
+                } => {
+                    camera.draw(&mut canvas, &tests::SCENE4, WIDTH, ASPECT_RATIO);
+                    canvas.present();
+                }
                 _ => {}
             }
         }
@@ -115,5 +92,3 @@ fn main() -> Result<(), String> {
 
     Ok(())
 }
-
-
