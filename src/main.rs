@@ -1,13 +1,11 @@
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::pixels::Color;
 use std::time::Duration;
 
 mod vectors;
 use vectors::Vector;
 
 mod scene;
-use scene::{ColorType, Light, Material, Scene, Sphere};
 
 mod camera;
 use camera::Camera;
@@ -29,9 +27,9 @@ fn main() -> Result<(), String> {
         .map_err(|e| e.to_string())?;
     let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
 
-    let scene = &tests::SCENE1;
+    let mut scene = &tests::SCENE1;
 
-    let camera = Camera::new(
+    let mut camera = Camera::new(
         Vector {
             x: -3.0,
             y: 0.0,
@@ -50,43 +48,40 @@ fn main() -> Result<(), String> {
     let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
         for event in event_pump.poll_iter() {
-            match event {
-                Event::Quit { .. }
-                | Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
-                    ..
-                } => break 'running,
-                Event::KeyDown {
-                    keycode: Some(Keycode::NUM_1),
-                    ..
-                } => {
-                    camera.draw(&mut canvas, &tests::SCENE1, WIDTH, ASPECT_RATIO);
-                    canvas.present();
+            if let Event::KeyDown {
+                keycode: Some(key), ..
+            } = event
+            {
+                match key {
+                    Keycode::Escape => break 'running,
+
+                    Keycode::Num1 => scene = &tests::SCENE1,
+                    Keycode::Num2 => scene = &tests::SCENE2,
+                    Keycode::Num3 => scene = &tests::SCENE3,
+                    Keycode::Num4 => scene = &tests::SCENE4,
+
+                    Keycode::W
+                    | Keycode::A
+                    | Keycode::S
+                    | Keycode::D
+                    | Keycode::Space
+                    | Keycode::LShift => {
+                        camera = camera.relocate(key);
+                    }
+                    Keycode::Q => {
+                        camera = camera.rotate(-15.0); 
+                    }
+                    Keycode::E => {
+                        camera = camera.rotate(15.0); 
+                    }
+                    _ => {}
                 }
-                Event::KeyDown {
-                    keycode: Some(Keycode::NUM_2),
-                    ..
-                } => {
-                    camera.draw(&mut canvas, &tests::SCENE2, WIDTH, ASPECT_RATIO);
-                    canvas.present();
-                }
-                Event::KeyDown {
-                    keycode: Some(Keycode::NUM_3),
-                    ..
-                } => {
-                    camera.draw(&mut canvas, &tests::SCENE3, WIDTH, ASPECT_RATIO);
-                    canvas.present();
-                }
-                Event::KeyDown {
-                    keycode: Some(Keycode::NUM_4),
-                    ..
-                } => {
-                    camera.draw(&mut canvas, &tests::SCENE4, WIDTH, ASPECT_RATIO);
-                    canvas.present();
-                }
-                _ => {}
+
+                camera.draw(&mut canvas, &scene, WIDTH, ASPECT_RATIO);
+                canvas.present();
             }
         }
+
         std::thread::sleep(Duration::from_millis(100));
     }
 

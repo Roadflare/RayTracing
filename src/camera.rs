@@ -1,7 +1,9 @@
-use crate::ColorType;
-use crate::scene::Scene;
+use crate::scene::{Scene,ColorType};
 use crate::vectors::Vector;
+
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
+
 
 pub struct Ray {
     pub origin: Vector,
@@ -25,9 +27,75 @@ pub struct Camera {
 }
 
 impl Camera {
+    pub fn new(coords: Vector, direction: Vector) -> Self {
+        Camera {
+            coords,
+            direction: direction.normalized(),
+        }
+    }
+
+    pub fn relocate(self, keycode: Keycode) -> Self {
+        let base = self.camera_basis();
+        let mut movement = Vector {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        };
+
+        match keycode {
+            Keycode::W => {
+                let forward = Vector {
+                    x: base.forward.x,
+                    y: 0.0,
+                    z: base.forward.z,
+                }
+                .normalized();
+                movement = movement + forward;
+            }
+            Keycode::S => {
+                let backward = Vector {
+                    x: base.forward.x,
+                    y: 0.0,
+                    z: base.forward.z,
+                }
+                .normalized();
+                movement = movement - backward;
+            }
+            Keycode::A => movement = movement - base.right,
+            Keycode::D => movement = movement + base.right,
+            Keycode::Space => movement = movement + Vector::make(0.0, 1.0, 0.0),
+            Keycode::LShift => movement = movement - Vector::make(0.0, 1.0, 0.0),
+            _ => {}
+        }
+
+        Camera {
+            coords: self.coords + movement.normalized(),
+            direction: self.direction,
+        }
+    }
+
+    pub fn rotate(&self, angle_degrees: f64) -> Self {
+        let angle_rad = angle_degrees.to_radians();
+        let cos_theta = angle_rad.cos();
+        let sin_theta = angle_rad.sin();
+
+        let dir = self.direction;
+        let new_direction = Vector {
+            x: dir.x * cos_theta - dir.z * sin_theta,
+            y: dir.y,
+            z: dir.x * sin_theta + dir.z * cos_theta,
+        }
+        .normalized();
+
+        Camera {
+            coords: self.coords,
+            direction: new_direction,
+        }
+    }
+    
     fn camera_basis(&self) -> CameraBasis {
-    let up = Vector::make(0.0, 1.0, 0.0);
-    let forward = self.direction;
+        let up = Vector::make(0.0, 1.0, 0.0);
+        let forward = self.direction;
         let right = forward.cross(&up).normalized();
         let true_up = right.cross(&forward).normalized();
         CameraBasis {
@@ -45,7 +113,7 @@ impl Camera {
         height: u16,
         aspect_ratio: f64,
         basis: &CameraBasis,
-        ) -> Ray {
+    ) -> Ray {
         let u = (x as f64 + 0.5) / width as f64 - 0.5;
         let v = (y as f64 + 0.5) / height as f64 - 0.5;
 
@@ -55,19 +123,13 @@ impl Camera {
         Ray::new(self.coords, direction)
     }
 
-    pub fn new(coords: Vector, direction: Vector) -> Self {
-        Camera {
-            coords,
-            direction: direction.normalized(),
-        }
-    }
-
     pub fn draw(
         &self,
         canvas: &mut sdl2::render::Canvas<sdl2::video::Window>,
         scene: &Scene,
         width: u16,
-        ratio: (u16, u16)) {
+        ratio: (u16, u16),
+    ) {
         let cam_basis = self.camera_basis();
         let (x_ratio, y_ratio) = ratio;
         let height = (width as f64 * (y_ratio as f64 / x_ratio as f64)) as u16;
