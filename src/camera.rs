@@ -45,7 +45,7 @@ impl Camera {
         height: u16,
         aspect_ratio: f64,
         basis: &CameraBasis,
-    ) -> Ray {
+        ) -> Ray {
         let u = (x as f64 + 0.5) / width as f64 - 0.5;
         let v = (y as f64 + 0.5) / height as f64 - 0.5;
 
@@ -67,8 +67,7 @@ impl Camera {
         canvas: &mut sdl2::render::Canvas<sdl2::video::Window>,
         scene: &Scene,
         width: u16,
-        ratio: (u16, u16),
-    ) {
+        ratio: (u16, u16)) {
         let cam_basis = self.camera_basis();
         let (x_ratio, y_ratio) = ratio;
         let height = (width as f64 * (y_ratio as f64 / x_ratio as f64)) as u16;
@@ -84,6 +83,7 @@ impl Camera {
         }
     }
 }
+
 struct CameraBasis {
     forward: Vector,
     right: Vector,
