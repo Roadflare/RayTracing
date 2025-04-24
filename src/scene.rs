@@ -53,11 +53,8 @@ impl Sphere {
         let b = 2.0 * oc.dot(&ray.direction);
         let c = oc.dot(&oc) - self.radius * self.radius;
         let discriminant: f64 = b * b - 4.0 * a * c;
-        if discriminant < 0. {
-            -f64::INFINITY
-        } else {
-            (-b - discriminant.powf(0.5)) / (2. * a)
-        }
+        if discriminant < 0. { return -f64::INFINITY }
+        (-b - discriminant.powf(0.5)) / (2. * a)
     }
 
     pub fn normal(&self, point: Vector) -> Vector {
