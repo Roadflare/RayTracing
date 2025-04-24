@@ -50,8 +50,7 @@ fn main() -> Result<(), String> {
         for event in event_pump.poll_iter() {
             if let Event::KeyDown {
                 keycode: Some(key), ..
-            } = event
-            {
+            } = event {
                 match key {
                     Keycode::Escape => break 'running,
 
@@ -59,6 +58,7 @@ fn main() -> Result<(), String> {
                     Keycode::Num2 => scene = &tests::SCENE2,
                     Keycode::Num3 => scene = &tests::SCENE3,
                     Keycode::Num4 => scene = &tests::SCENE4,
+                    Keycode::Num5 => scene = &tests::SCENE5,
 
                     Keycode::W
                     | Keycode::A
