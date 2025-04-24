@@ -12,10 +12,17 @@ use scene::{ColorType, Light, Material, Scene, Sphere};
 mod camera;
 use camera::Camera;
 
+mod tests;
+
+
 const WIDTH: u16 = 1400;
 const ASPECT_RATIO: (u16, u16) = (16, 10);
 
+
 fn main() -> Result<(), String> {
+
+    
+
     let sdl_context = sdl2::init()?;
     let video = sdl_context.video()?;
     let (x_ratio, y_ratio) = ASPECT_RATIO;
@@ -84,6 +91,22 @@ fn main() -> Result<(), String> {
                     keycode: Some(Keycode::Escape),
                     ..
                 } => break 'running,
+                Event::KeyDown {
+                    keycode: Some(Keycode::NUM_1),
+                     ..
+                } => tests::draw_placeholder(&tests::scene1),
+                Event::KeyDown {
+                    keycode: Some(Keycode::NUM_2),
+                     ..
+                } => tests::draw_placeholder(&tests::scene2),
+                Event::KeyDown {
+                    keycode: Some(Keycode::NUM_3),
+                     ..
+                } => tests::draw_placeholder(&tests::scene3),
+                Event::KeyDown {
+                    keycode: Some(Keycode::NUM_4),
+                     ..
+                } => tests::draw_placeholder(&tests::scene4),
                 _ => {}
             }
         }
@@ -92,3 +115,5 @@ fn main() -> Result<(), String> {
 
     Ok(())
 }
+
+
