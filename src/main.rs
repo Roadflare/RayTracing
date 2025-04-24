@@ -94,19 +94,19 @@ fn main() -> Result<(), String> {
                 Event::KeyDown {
                     keycode: Some(Keycode::NUM_1),
                      ..
-                } => tests::draw_placeholder(&tests::scene1),
+                } => tests::draw_placeholder(&tests::SCENE1),
                 Event::KeyDown {
                     keycode: Some(Keycode::NUM_2),
                      ..
-                } => tests::draw_placeholder(&tests::scene2),
+                } => tests::draw_placeholder(&tests::SCENE2),
                 Event::KeyDown {
                     keycode: Some(Keycode::NUM_3),
                      ..
-                } => tests::draw_placeholder(&tests::scene3),
+                } => tests::draw_placeholder(&tests::SCENE3),
                 Event::KeyDown {
                     keycode: Some(Keycode::NUM_4),
                      ..
-                } => tests::draw_placeholder(&tests::scene4),
+                } => tests::draw_placeholder(&tests::SCENE4),
                 _ => {}
             }
         }
