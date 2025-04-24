@@ -9,16 +9,24 @@ pub struct Scene {
 }
 
 impl Scene {
+    pub fn make(spheres: Vec<Sphere>, lights: Vec<Light>, ambient_light: f64) -> Scene {
+        Scene {
+        spheres: spheres,
+        lights: lights,
+        ambient_light: ambient_light,
+    }
+}
+
     pub fn trace_ray(&self, ray: &Ray) -> Option<(&Sphere, Vector)> {
-        let mut closest: (f64, &Sphere, Vector) = (-1., &self.spheres[0], ray.origin);
+        let mut closest: (f64, &Sphere, Vector) = (-f64::INFINITY, &self.spheres[0], ray.origin);
         for sphere in self.spheres.iter() {
             let d = sphere.hit_distance(ray);
             if d > 0. && (d < closest.0 || closest.0 < 0.) {
                 closest = (d, &sphere, ray.origin + ray.direction * d);
             }
         }
-        if closest.0 < 0. { None }
-        else { Some((closest.1, closest.2))}
+        if closest.0 < 0. { return None }
+        Some((closest.1, closest.2))
     }
 }
 pub enum ColorType {
@@ -43,7 +51,7 @@ impl Sphere {
         let b = 2.0 * oc.dot(&ray.direction);
         let c = oc.dot(&oc) - self.radius * self.radius;
         let discriminant: f64 = b * b - 4.0 * a * c;
-        if discriminant < 0. { -1. }
+        if discriminant < 0. { -f64::INFINITY }
         else { (-b - discriminant.powf(0.5)) / (2. * a) }
     }
 
