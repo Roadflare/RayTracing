@@ -4,33 +4,11 @@ use sdl2::pixels::Color;
 
 pub struct Scene {
     pub spheres: Vec<Sphere>,
+    pub triangles: Vec<Triangle>,
     pub lights: Vec<Light>,
     pub ambient_light: f64,
 }
 
-impl Scene {
-    pub fn make(spheres: Vec<Sphere>, lights: Vec<Light>, ambient_light: f64) -> Scene {
-        Scene {
-            spheres: spheres,
-            lights: lights,
-            ambient_light: ambient_light,
-        }
-    }
-
-    pub fn trace_ray(&self, ray: &Ray) -> Option<(&Sphere, Vector)> {
-        let mut closest: (f64, &Sphere, Vector) = (-f64::INFINITY, &self.spheres[0], ray.origin);
-        for sphere in self.spheres.iter() {
-            let d = sphere.hit_distance(ray);
-            if d > 0. && (d < closest.0 || closest.0 < 0.) {
-                closest = (d, &sphere, ray.origin + ray.direction * d);
-            }
-        }
-        if closest.0 < 0. {
-            return None;
-        }
-        Some((closest.1, closest.2))
-    }
-}
 pub enum ColorType {
     Solid(Color),
     Function(fn(Vector) -> Color), //skalarno polje za barvo
@@ -48,23 +26,8 @@ pub struct Sphere {
 
 pub struct Triangle {
     pub vertices: (Vector, Vector, Vector),
-    pub normal: Vector
-}
-
-impl Sphere {
-    pub fn hit_distance(&self, ray: &Ray) -> f64 {
-        let oc = ray.origin - self.center;
-        let a = ray.direction.dot(&ray.direction);
-        let b = 2.0 * oc.dot(&ray.direction);
-        let c = oc.dot(&oc) - self.radius * self.radius;
-        let discriminant: f64 = b * b - 4.0 * a * c;
-        if discriminant < 0. { return -f64::INFINITY }
-        (-b - discriminant.powf(0.5)) / (2. * a)
-    }
-
-    pub fn normal(&self, point: Vector) -> Vector {
-        (point - self.center) / self.radius
-    }
+    pub normal: Vector,
+    pub material: Material,
 }
 
 pub struct Light {
@@ -72,21 +35,45 @@ pub struct Light {
     pub intensity: f64, // od 0.0 do 1.0
 }
 
-impl Ray {
-    pub fn trace<'a>(&'a self, scene: &'a Scene) -> Option<(&Sphere, Vector)> {
-        let mut closest: (f64, &Sphere, Vector) = (-1., &scene.spheres[0], self.origin);
-        for sphere in scene.spheres.iter() {
-            let d = self.hit_distance(sphere);
-            if d > 0. && (d < closest.0 || closest.0 < 0.) {
-                closest = (d, &sphere, self.origin + self.direction * d);
-            }
+pub enum Collision<'a> {
+    Sphere(&'a Sphere, Vector),
+    Triangle(&'a Triangle, Vector)
+}
+
+impl Scene {
+    pub fn make(spheres: Vec<Sphere>, triangles: Vec<Triangle>, lights: Vec<Light>, ambient_light: f64) -> Scene {
+        Scene {
+            spheres: spheres,
+            triangles: triangles,
+            lights: lights,
+            ambient_light: ambient_light,
         }
-        if closest.0 < 0. { return None; }
-        Some((closest.1, closest.2))
     }
 }
 
 impl Ray {
+    pub fn trace<'a>(&'a self, scene: &'a Scene) -> Option<Collision> {
+        let mut closest: (f64, Collision) = (-f64::INFINITY, Collision::Sphere(&scene.spheres[0], self.origin));
+        if scene.spheres.len() > 0 {
+            for sphere in scene.spheres.iter() {
+                let d = self.hit_distance(sphere);
+                if d > 0. && (d < closest.0 || closest.0 < 0.) {
+                    closest = (d, Collision::Sphere(&sphere, self.origin + self.direction * d));
+                }
+            }
+        }
+        if scene.triangles.len() > 0 {
+            for triangle in scene.triangles.iter() {
+                let d = self.hit_distance_triangle(triangle);
+                if d > 0. && (d < closest.0 || closest.0 < 0.) {
+                    closest = (d, Collision::Triangle(&triangle, self.origin + self.direction * d));
+                }
+            }
+        }
+        if closest.0 < 0. { return None; }
+        Some(closest.1)
+    }
+
     pub fn hit_distance(&self, sphere: &Sphere) -> f64 {
         let oc = self.origin - sphere.center;
         /*
@@ -134,8 +121,31 @@ impl Ray {
     }
 }
 
+
 impl Sphere {
+    pub fn make(center: &Vector, radius: f64, material: Material) -> Self {
+        Sphere{ center: *center, radius: radius, material: material }
+    }
+    pub fn hit_distance(&self, ray: &Ray) -> f64 {
+        let oc = ray.origin - self.center;
+        let a = ray.direction.dot(&ray.direction);
+        let b = 2.0 * oc.dot(&ray.direction);
+        let c = oc.dot(&oc) - self.radius * self.radius;
+        let discriminant: f64 = b * b - 4.0 * a * c;
+        if discriminant < 0. { return -f64::INFINITY }
+        (-b - discriminant.powf(0.5)) / (2. * a)
+    }
+
     pub fn normal(&self, point: Vector) -> Vector {
         (point - self.center) / self.radius
+    }
+}
+
+
+impl Triangle {
+    pub fn make(a: Vector, b: Vector, c: Vector, material: Material) -> Self {
+        let (v1, v2) = (b - a, c - a);
+        let n = v1.cross(&v2).normalized();
+        Triangle { vertices: (a, b, c), normal: n, material: material }
     }
 }

@@ -1,4 +1,4 @@
-use crate::scene::{Scene,ColorType};
+use crate::scene::{Scene,ColorType,Collision};
 use crate::vectors::Vector;
 
 use sdl2::keyboard::Keycode;
@@ -10,6 +10,21 @@ pub struct Ray {
     pub direction: Vector,
 }
 
+pub struct Camera {
+    // Global camera position and orientation
+    pub coords: Vector,
+    pub direction: Vector,
+}
+
+struct CameraBasis {
+    // Relative orientation of the camera
+    forward: Vector,
+    right: Vector,
+    up: Vector,
+}
+
+
+
 impl Ray {
     fn new(origin: Vector, direction: Vector) -> Self {
         Ray {
@@ -17,13 +32,6 @@ impl Ray {
             direction: direction.normalized(),
         }
     }
-}
-
-pub struct Camera {
-    ///Location of camera/where all rays shoot from
-    pub coords: Vector,
-    /// Direction that camera faces
-    pub direction: Vector,
 }
 
 impl Camera {
@@ -146,30 +154,33 @@ impl Camera {
     }
 }
 
-struct CameraBasis {
-    forward: Vector,
-    right: Vector,
-    up: Vector,
-}
 
 fn trace_color(scene: &Scene, ray: &Ray, y: u16, height: u16) -> Color {
-    if let Some((sphere, point)) = ray.trace(scene) {
-        let normal = sphere.normal(point);
-        let brightness = compute_lighting(scene, point, normal);
+    let (brightness, base_color) = match ray.trace(scene) {
+        Some(Collision::Sphere(sphere, point)) => {
+            let brightness = compute_lighting(scene, point, sphere.normal(point));
+            let base_color = match sphere.material.color {
+                ColorType::Solid(c) => c,
+                ColorType::Function(f) => f(point),
+            };
+            (brightness, base_color)
+        },
+        Some(Collision::Triangle(triangle, point)) => {
+            let brightness = compute_lighting(scene, point, triangle.normal);
+            let base_color = match triangle.material.color {
+                ColorType::Solid(c) => c,
+                ColorType::Function(f) => f(point)
+            };
+            (brightness, base_color)
+        },
+        None => { (1., Color::RGB(150, 170, 150 + (y as f64 * 105. / height as f64) as u8)) }
+    };
 
-        let base_color = match &sphere.material.color {
-            ColorType::Solid(c) => *c,
-            ColorType::Function(f) => f(point),
-        };
+    let r = (base_color.r as f64 * brightness) as u8;
+    let g = (base_color.g as f64 * brightness) as u8;
+    let b = (base_color.b as f64 * brightness) as u8;
 
-        let r = (base_color.r as f64 * brightness) as u8;
-        let g = (base_color.g as f64 * brightness) as u8;
-        let b = (base_color.b as f64 * brightness) as u8;
-
-        Color::RGB(r, g, b)
-    } else {
-        Color::RGB(150, 170, 150 + (y as f64 * 105. / height as f64) as u8)
-    }
+    Color::RGB(r, g, b)
 }
 
 fn compute_lighting(scene: &Scene, point: Vector, normal: Vector) -> f64 {

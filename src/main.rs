@@ -59,6 +59,7 @@ fn main() -> Result<(), String> {
                     Keycode::Num3 => scene = &tests::SCENE3,
                     Keycode::Num4 => scene = &tests::SCENE4,
                     Keycode::Num5 => scene = &tests::SCENE5,
+                    Keycode::Num6 => scene = &tests::SCENE6,
 
                     Keycode::W
                     | Keycode::A
