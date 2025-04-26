@@ -45,7 +45,7 @@ pub struct Vector {
     }
 
     //projecira tako da kamera vidi. pozicije kamere se še ne da spreminjati(potrebna implementacija)
-    pub fn project(v: &Self, width: f64, height: f64, fov: f64) -> (i32, i32) {
+    fn project(v: &Self, width: f64, height: f64, fov: f64) -> (i32, i32) {
         let scale = fov / (fov + v.z);
         let x_proj = v.x * scale + width / 2.0;
         let y_proj = v.y * scale + height / 2.0;

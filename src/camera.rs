@@ -91,7 +91,7 @@ struct CameraBasis {
 }
 
 fn trace_color(scene: &Scene, ray: &Ray, y: u16, height: u16) -> Color {
-    if let Some((sphere, point)) = scene.trace_ray(ray) {
+    if let Some((sphere, point)) = ray.trace(scene) {
         let normal = sphere.normal(point);
         let brightness = compute_lighting(scene, point, normal);
 
@@ -118,7 +118,7 @@ fn compute_lighting(scene: &Scene, point: Vector, normal: Vector) -> f64 {
 
         // Pomaknjena začetna točka, da se izognemo samo-senci
         let shadow_ray = Ray::new(point + normal * 0.001, light_dir);
-        let in_shadow = scene.trace_ray(&shadow_ray).is_some();
+        let in_shadow = &shadow_ray.trace(scene).is_some();
 
         if !in_shadow {
             let light_contrib = normal.dot(&light_dir).max(0.0) * light.intensity;

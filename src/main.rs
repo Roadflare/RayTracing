@@ -53,7 +53,7 @@ fn main() -> Result<(), String> {
             },
         ],
         lights: vec![Light {
-            position: Vector::make(0.0, 0.0, -5.0),
+            position: Vector::make(0.0, 0.0, -50.0),
             intensity: 1.0,
         }],
         ambient_light: 0.3,
@@ -63,7 +63,7 @@ fn main() -> Result<(), String> {
         Vector {
             x: -3.0,
             y: 0.0,
-            z: 0.0,
+            z: -2.0,
         },
         Vector {
             x: 1.0,
