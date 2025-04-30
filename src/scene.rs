@@ -56,17 +56,17 @@ impl Ray {
         let mut closest: (f64, Collision) = (-f64::INFINITY, Collision::Sphere(&scene.spheres[0], self.origin));
         if scene.spheres.len() > 0 {
             for sphere in scene.spheres.iter() {
-                let d = self.hit_distance(sphere);
-                if d > 0. && (d < closest.0 || closest.0 < 0.) {
-                    closest = (d, Collision::Sphere(&sphere, self.origin + self.direction * d));
+                let distance = self.hit_distance(sphere);
+                if distance > 0. && (distance < closest.0 || closest.0 < 0.) {
+                    closest = (distance, Collision::Sphere(&sphere, self.origin + self.direction * distance));
                 }
             }
         }
         if scene.triangles.len() > 0 {
             for triangle in scene.triangles.iter() {
-                let d = self.hit_distance_triangle(triangle);
-                if d > 0. && (d < closest.0 || closest.0 < 0.) {
-                    closest = (d, Collision::Triangle(&triangle, self.origin + self.direction * d));
+                let distance = self.hit_distance_triangle(triangle);
+                if distance > 0. && (distance < closest.0 || closest.0 < 0.) {
+                    closest = (distance, Collision::Triangle(&triangle, self.origin + self.direction * distance));
                 }
             }
         }
