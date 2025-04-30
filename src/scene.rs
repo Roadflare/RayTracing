@@ -52,7 +52,7 @@ impl Scene {
 }
 
 impl Ray {
-    pub fn trace<'a>(&'a self, scene: &'a Scene) -> Option<Collision> {
+    pub fn trace<'a>(&'a self, scene: &'a Scene) -> Option<Collision<'a>> {
         let mut closest: (f64, Collision) = (-f64::INFINITY, Collision::Sphere(&scene.spheres[0], self.origin));
         if scene.spheres.len() > 0 {
             for sphere in scene.spheres.iter() {
