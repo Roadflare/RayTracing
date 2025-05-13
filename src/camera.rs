@@ -1,14 +1,10 @@
-use crate::scene::{Scene,ColorType,Collision};
+use crate::scene::{Collision, ColorType, Material, Ray, Scene};
 use crate::vectors::Vector;
 
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 
-
-pub struct Ray {
-    pub origin: Vector,
-    pub direction: Vector,
-}
+const GLOBINA: u32 = 6;
 
 pub struct Camera {
     // Global camera position and orientation
@@ -21,17 +17,6 @@ struct CameraBasis {
     forward: Vector,
     right: Vector,
     up: Vector,
-}
-
-
-
-impl Ray {
-    fn new(origin: Vector, direction: Vector) -> Self {
-        Ray {
-            origin,
-            direction: direction.normalized(),
-        }
-    }
 }
 
 impl Camera {
@@ -100,7 +85,7 @@ impl Camera {
             direction: new_direction,
         }
     }
-    
+
     fn camera_basis(&self) -> CameraBasis {
         let up = Vector::make(0.0, 1.0, 0.0);
         let forward = self.direction;
@@ -146,7 +131,7 @@ impl Camera {
         for y in 0..height {
             for x in 0..width {
                 let ray = self.generate_ray(x, y, width, height, aspect_ratio, &cam_basis);
-                let color = trace_color(scene, &ray, y, height);
+                let color = trace_color(scene, &ray, y, height, GLOBINA);
                 canvas.set_draw_color(color);
                 let _ = canvas.draw_point(sdl2::rect::Point::new(x as i32, y as i32));
             }
@@ -154,33 +139,89 @@ impl Camera {
     }
 }
 
+fn trace_color(scene: &Scene, ray: &Ray, y: u16, height: u16, depth: u32) -> Color {
+    if depth == 0 {
+        return Color::RGB(0, 0, 0); // Max depth reached
+    }
 
-fn trace_color(scene: &Scene, ray: &Ray, y: u16, height: u16) -> Color {
-    let (brightness, base_color) = match ray.trace(scene) {
-        Some(Collision::Sphere(sphere, point)) => {
-            let brightness = compute_lighting(scene, point, sphere.normal(point));
-            let base_color = match sphere.material.color {
-                ColorType::Solid(c) => c,
-                ColorType::Function(f) => f(point),
-            };
-            (brightness, base_color)
-        },
-        Some(Collision::Triangle(triangle, point)) => {
-            let brightness = compute_lighting(scene, point, triangle.normal);
-            let base_color = match triangle.material.color {
-                ColorType::Solid(c) => c,
-                ColorType::Function(f) => f(point)
-            };
-            (brightness, base_color)
-        },
-        None => { (1., Color::RGB(150, 170, 150 + (y as f64 * 105. / height as f64) as u8)) }
+    match ray.trace(scene) {
+        Some(Collision::Sphere(sphere, point)) => handle_hit(
+            point,
+            sphere.normal(point),
+            &sphere.material,
+            scene,
+            ray,
+            y,
+            height,
+            depth,
+        ),
+
+        Some(Collision::Triangle(triangle, point)) => handle_hit(
+            point,
+            triangle.normal,
+            &triangle.material,
+            scene,
+            ray,
+            y,
+            height,
+            depth,
+        ),
+
+        None => {
+            let sky = 150 + (y as f64 * 105. / height as f64) as u8;
+            Color::RGB(150, 170, sky)
+        }
+    }
+}
+
+fn handle_hit(
+    point: Vector,
+    normal: Vector,
+    material: &Material,
+    scene: &Scene,
+    ray: &Ray,
+    y: u16,
+    height: u16,
+    depth: u32,
+) -> Color {
+    let brightness = compute_lighting(scene, point, normal);
+
+    let base_color = match &material.color {
+        ColorType::Solid(c) => *c,
+        ColorType::Function(f) => f(point),
     };
 
-    let r = (base_color.r as f64 * brightness) as u8;
-    let g = (base_color.g as f64 * brightness) as u8;
-    let b = (base_color.b as f64 * brightness) as u8;
+    let reflectivity = material.reflectivity;
 
-    Color::RGB(r, g, b)
+    if reflectivity > 0.0 {
+        let reflected_dir = ray.direction.reflect(&normal).normalized();
+        let reflected_ray = Ray::new(point + normal * 0.001, reflected_dir);
+        let reflected_color = trace_color(scene, &reflected_ray, y, height, depth - 1);
+
+        blend_colors(base_color, reflected_color, brightness, reflectivity)
+    } else {
+        scale_color(base_color, brightness)
+    }
+}
+
+fn scale_color(color: Color, brightness: f64) -> Color {
+    Color::RGB(
+        (color.r as f64 * brightness).clamp(0.0, 255.0) as u8,
+        (color.g as f64 * brightness).clamp(0.0, 255.0) as u8,
+        (color.b as f64 * brightness).clamp(0.0, 255.0) as u8,
+    )
+}
+
+fn blend_colors(base: Color, reflected: Color, brightness: f64, reflectivity: f64) -> Color {
+    let inv_r = 1.0 - reflectivity;
+    Color::RGB(
+        ((base.r as f64 * brightness * inv_r + reflected.r as f64 * reflectivity).clamp(0.0, 255.0))
+            as u8,
+        ((base.g as f64 * brightness * inv_r + reflected.g as f64 * reflectivity).clamp(0.0, 255.0))
+            as u8,
+        ((base.b as f64 * brightness * inv_r + reflected.b as f64 * reflectivity).clamp(0.0, 255.0))
+            as u8,
+    )
 }
 
 fn compute_lighting(scene: &Scene, point: Vector, normal: Vector) -> f64 {

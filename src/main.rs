@@ -50,7 +50,8 @@ fn main() -> Result<(), String> {
         for event in event_pump.poll_iter() {
             if let Event::KeyDown {
                 keycode: Some(key), ..
-            } = event {
+            } = event
+            {
                 match key {
                     Keycode::Escape => break 'running,
 
@@ -70,10 +71,10 @@ fn main() -> Result<(), String> {
                         camera = camera.relocate(key);
                     }
                     Keycode::Q => {
-                        camera = camera.rotate(-15.0); 
+                        camera = camera.rotate(-15.0);
                     }
                     Keycode::E => {
-                        camera = camera.rotate(15.0); 
+                        camera = camera.rotate(15.0);
                     }
                     _ => {}
                 }
