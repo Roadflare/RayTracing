@@ -4,21 +4,25 @@ use sdl2::pixels::Color;
 pub struct Scene {
     pub spheres: Vec<Sphere>,
     pub triangles: Vec<Triangle>,
+    pub planes: Vec<Plane>,
     pub lights: Vec<Light>,
     pub ambient_light: f64,
 }
+
 impl Scene {
     pub fn make(
         spheres: Vec<Sphere>,
         triangles: Vec<Triangle>,
+        planes: Vec<Plane>,
         lights: Vec<Light>,
         ambient_light: f64,
     ) -> Scene {
         Scene {
-            spheres: spheres,
-            triangles: triangles,
-            lights: lights,
-            ambient_light: ambient_light,
+            spheres,
+            triangles,
+            planes,
+            lights,
+            ambient_light,
         }
     }
 }
@@ -46,6 +50,7 @@ pub struct Material {
     pub color: ColorType,
     pub reflectivity: f64,
 }
+
 pub enum ColorType {
     Solid(Color),
     Function(fn(Vector) -> Color), //skalarno polje za barvo
@@ -65,103 +70,7 @@ pub struct Light {
 pub enum Collision<'a> {
     Sphere(&'a Sphere, Vector),
     Triangle(&'a Triangle, Vector),
-}
-
-pub struct Ray {
-    pub origin: Vector,
-    pub direction: Vector,
-}
-
-impl Ray {
-    pub fn new(origin: Vector, direction: Vector) -> Self {
-        Ray {
-            origin,
-            direction: direction.normalized(),
-        }
-    }
-    pub fn trace<'a>(&'a self, scene: &'a Scene) -> Option<Collision<'a>> {
-        let mut closest: (f64, Collision) = (
-            -f64::INFINITY,
-            Collision::Sphere(&scene.spheres[0], self.origin),
-        );
-        if scene.spheres.len() > 0 {
-            for sphere in scene.spheres.iter() {
-                let distance = self.hit_distance(sphere);
-                if distance > 0. && (distance < closest.0 || closest.0 < 0.) {
-                    closest = (
-                        distance,
-                        Collision::Sphere(&sphere, self.origin + self.direction * distance),
-                    );
-                }
-            }
-        }
-        if scene.triangles.len() > 0 {
-            for triangle in scene.triangles.iter() {
-                let distance = self.hit_distance_triangle(triangle);
-                if distance > 0. && (distance < closest.0 || closest.0 < 0.) {
-                    closest = (
-                        distance,
-                        Collision::Triangle(&triangle, self.origin + self.direction * distance),
-                    );
-                }
-            }
-        }
-        if closest.0 < 0. {
-            return None;
-        }
-        Some(closest.1)
-    }
-
-    pub fn hit_distance(&self, sphere: &Sphere) -> f64 {
-        let oc = self.origin - sphere.center;
-        /*
-        a = ||ray_dir||^2
-        b = 2 ray_dir * oc
-        c = ||oc||^2 - r^2
-
-        D = b^2 - 4ac
-        */
-        let a = self.direction.dot(&self.direction);
-        let b = 2.0 * oc.dot(&self.direction);
-        let c = oc.dot(&oc) - sphere.radius * sphere.radius;
-        let discriminant: f64 = b * b - 4.0 * a * c;
-        if discriminant < 0. {
-            return -1.;
-        }
-        return (-b - discriminant.powf(0.5)) / (2. * a);
-    }
-
-    pub fn hit_distance_triangle(&self, triangle: &Triangle) -> f64 {
-        // algorithm from: https://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
-
-        let (v0, v1, v2) = triangle.vertices;
-        let (e1, e2) = (v1 - v0, v2 - v0);
-        let h = self.direction.cross(&e2);
-        let a = h.dot(&e1);
-        if -0.00001 < a && a < 0.00001 {
-            return -1.;
-        }
-
-        let f = 1. / a;
-        let s = v0 - self.origin;
-        let u = f * s.dot(&h);
-        if u > 1. || u < 0. {
-            return -1.;
-        }
-
-        let q = e1.cross(&s);
-        let v = f * self.direction.dot(&q);
-        if v < 0. || u + v > 1. {
-            return -1.;
-        }
-
-        let t = e2.dot(&q);
-        if t <= 0.00001 {
-            return -1.;
-        }
-
-        t
-    }
+    Plane(&'a Plane, Vector),
 }
 
 impl Triangle {
@@ -174,4 +83,10 @@ impl Triangle {
             material: material,
         }
     }
+}
+
+pub struct Plane {
+    pub point: Vector,  // Točka na ravnini
+    pub normal: Vector, // Normala (naj bo normirana)
+    pub material: Material,
 }

@@ -1,5 +1,4 @@
-use crate::scene::Scene;
-use crate::scene::{ColorType, Light, Material, Sphere, Triangle};
+use crate::scene::{Scene, ColorType, Light, Material, Plane, Sphere, Triangle};
 use crate::vectors::Vector;
 use sdl2::pixels::Color;
 use std::sync::LazyLock; //Black magic
@@ -7,6 +6,7 @@ use std::sync::LazyLock; //Black magic
 pub static SCENE1: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
+            // Zelena sfera
             Sphere::make(
                 &Vector::make(0.5, 0.0, -1.0),
                 1.0,
@@ -15,6 +15,7 @@ pub static SCENE1: LazyLock<Scene> = LazyLock::new(|| {
                     reflectivity: 0.3,
                 },
             ),
+            // Rdeča sfera
             Sphere::make(
                 &Vector::make(0.5, 0.0, -3.0),
                 0.5,
@@ -23,6 +24,7 @@ pub static SCENE1: LazyLock<Scene> = LazyLock::new(|| {
                     reflectivity: 0.7,
                 },
             ),
+            // Modra sfera
             Sphere::make(
                 &Vector::make(0.5, 0.0, 2.0),
                 1.5,
@@ -32,7 +34,15 @@ pub static SCENE1: LazyLock<Scene> = LazyLock::new(|| {
                 },
             ),
         ],
-        vec![],
+        vec![], // triangles
+        vec![Plane {
+            point: Vector::make(0.0, -2.0, 0.0),
+            normal: Vector::make(0.0, 1.0, 0.0),
+            material: Material {
+                color: ColorType::Solid(Color::RGB(100, 100, 100)),
+                reflectivity: 0.0,
+            },
+        }],
         vec![
             Light {
                 position: Vector::make(0.5, 0.0, -5.0),
@@ -43,7 +53,7 @@ pub static SCENE1: LazyLock<Scene> = LazyLock::new(|| {
                 intensity: 1.0,
             },
         ],
-        0.3,
+        0.3, // ambient light
     )
 });
 
@@ -76,6 +86,14 @@ pub static SCENE2: LazyLock<Scene> = LazyLock::new(|| {
             },
         ],
         vec![],
+        vec![Plane {
+            point: Vector::make(0.0, -2.0, 0.0),
+            normal: Vector::make(0.0, 1.0, 0.0), // y = -1 ravnina
+            material: Material {
+                color: ColorType::Solid(Color::RGB(100, 100, 100)),
+                reflectivity: 0.0,
+            },
+        }],
         vec![Light {
             position: Vector::make(3.0, 15.0, 0.0),
             intensity: 1.0,
@@ -125,6 +143,14 @@ pub static SCENE3: LazyLock<Scene> = LazyLock::new(|| {
             },
         ],
         vec![],
+        vec![Plane {
+            point: Vector::make(0.0, -2.0, 0.0),
+            normal: Vector::make(0.0, 1.0, 0.0), // y = -1 ravnina
+            material: Material {
+                color: ColorType::Solid(Color::RGB(100, 100, 100)),
+                reflectivity: 0.0,
+            },
+        }],
         vec![
             Light {
                 position: Vector::make(0.0, 0.0, -5.0),
@@ -179,6 +205,7 @@ pub static SCENE4: LazyLock<Scene> = LazyLock::new(|| {
                 },
             },
         ],
+        vec![],
         vec![],
         vec![
             Light {
@@ -235,6 +262,7 @@ pub static SCENE5: LazyLock<Scene> = LazyLock::new(|| {
             },
         ],
         vec![],
+        vec![],
         vec![Light {
             position: Vector::make(-5.0, 0.0, -20.0),
             intensity: 0.75,
@@ -262,6 +290,7 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
                 reflectivity: 0.3,
             },
         )],
+        vec![],
         vec![Light {
             position: Vector::make(1., 1., 0.),
             intensity: 0.75,
@@ -269,3 +298,4 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
         0.2,
     )
 });
+

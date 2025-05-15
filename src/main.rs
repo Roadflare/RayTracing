@@ -14,6 +14,7 @@ mod tests;
 
 const WIDTH: u16 = 1400;
 const ASPECT_RATIO: (u16, u16) = (16, 10);
+const GLOBINA: u32 = 2;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -42,7 +43,7 @@ fn main() -> Result<(), String> {
         },
     );
 
-    camera.draw(&mut canvas, &scene, WIDTH, ASPECT_RATIO);
+    camera.draw(&mut canvas, &scene, WIDTH, ASPECT_RATIO, GLOBINA);
     canvas.present();
 
     let mut event_pump = sdl_context.event_pump()?;
@@ -79,7 +80,7 @@ fn main() -> Result<(), String> {
                     _ => {}
                 }
 
-                camera.draw(&mut canvas, &scene, WIDTH, ASPECT_RATIO);
+                camera.draw(&mut canvas, &scene, WIDTH, ASPECT_RATIO, GLOBINA);
                 canvas.present();
             }
         }
