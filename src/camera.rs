@@ -1,10 +1,8 @@
-use crate::scene::{Collision, ColorType, Material, Sphere, Plane, Triangle, Scene};
+use crate::scene::{Collision, ColorType, Material, Plane, Scene, Sphere, Triangle};
 use crate::vectors::Vector;
 
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-
-
 
 pub struct Camera {
     // Global camera position and orientation
@@ -278,7 +276,6 @@ fn background_color(dir: Vector) -> Color {
     Color::RGB(r as u8, g as u8, b as u8)
 }
 
-
 pub struct Ray {
     pub origin: Vector,
     pub direction: Vector,
@@ -292,40 +289,40 @@ impl Ray {
         }
     }
     pub fn trace<'a>(&'a self, scene: &'a Scene) -> Option<Collision<'a>> {
-    let mut closest: Option<(f64, Collision)> = None;
+        let mut closest: Option<(f64, Collision)> = None;
 
-    // Spheres
-    for sphere in &scene.spheres {
-        if let Some(dist) = self.sphere_hit_detection(sphere) {
-            if closest.as_ref().map_or(true, |(d, _)| dist < *d) {
-                let hit_point = self.origin + self.direction * dist;
-                closest = Some((dist, Collision::Sphere(sphere, hit_point)));
+        // Spheres
+        for sphere in &scene.spheres {
+            if let Some(dist) = self.sphere_hit_detection(sphere) {
+                if closest.as_ref().map_or(true, |(d, _)| dist < *d) {
+                    let hit_point = self.origin + self.direction * dist;
+                    closest = Some((dist, Collision::Sphere(sphere, hit_point)));
+                }
             }
         }
-    }
 
-    // Triangles
-    for triangle in &scene.triangles {
-        if let Some(dist) = self.triangle_hit_detection(triangle) {
-            if closest.as_ref().map_or(true, |(d, _)| dist < *d) {
-                let hit_point = self.origin + self.direction * dist;
-                closest = Some((dist, Collision::Triangle(triangle, hit_point)));
+        // Triangles
+        for triangle in &scene.triangles {
+            if let Some(dist) = self.triangle_hit_detection(triangle) {
+                if closest.as_ref().map_or(true, |(d, _)| dist < *d) {
+                    let hit_point = self.origin + self.direction * dist;
+                    closest = Some((dist, Collision::Triangle(triangle, hit_point)));
+                }
             }
         }
-    }
 
-    // Planes
-    for plane in &scene.planes {
-        if let Some(hit_point) = self.plane_hit_detection(plane) {
-            let dist = (hit_point - self.origin).length();
-            if closest.as_ref().map_or(true, |(d, _)| dist < *d) {
-                closest = Some((dist, Collision::Plane(plane, hit_point)));
+        // Planes
+        for plane in &scene.planes {
+            if let Some(hit_point) = self.plane_hit_detection(plane) {
+                let dist = (hit_point - self.origin).length();
+                if closest.as_ref().map_or(true, |(d, _)| dist < *d) {
+                    closest = Some((dist, Collision::Plane(plane, hit_point)));
+                }
             }
         }
-    }
 
-    closest.map(|(_, collision)| collision)
-}
+        closest.map(|(_, collision)| collision)
+    }
 
     pub fn plane_hit_detection(&self, plane: &Plane) -> Option<Vector> {
         let denom = plane.normal.dot(&self.direction);
@@ -340,7 +337,6 @@ impl Ray {
             None // Ravnina je za kamero
         }
     }
-
 
     pub fn sphere_hit_detection(&self, sphere: &Sphere) -> Option<f64> {
         let oc = self.origin - sphere.center;
@@ -369,25 +365,25 @@ impl Ray {
         let (v0, v1, v2) = triangle.vertices;
         let (e1, e2) = (v1 - v0, v2 - v0);
         let h = self.direction.cross(&e2);
-        let a = h.dot(&e1);
+        let a = e1.dot(&h);
         if -0.00001 < a && a < 0.00001 {
             return None;
         }
 
-        let f = 1. / a;
-        let s = v0 - self.origin;
+        let f = 1.0 / a;
+        let s = self.origin - v0;
         let u = f * s.dot(&h);
         if u > 1. || u < 0. {
             return None;
         }
 
-        let q = e1.cross(&s);
+        let q = s.cross(&e1);
         let v = f * self.direction.dot(&q);
         if v < 0. || u + v > 1. {
             return None;
         }
 
-        let t = e2.dot(&q);
+        let t = f * e2.dot(&q);
         if t > 0.001 { Some(t) } else { None }
     }
 }

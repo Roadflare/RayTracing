@@ -1,4 +1,4 @@
-use crate::scene::{Scene, ColorType, Light, Material, Plane, Sphere, Triangle};
+use crate::scene::{ColorType, Light, Material, Plane, Scene, Sphere, Triangle};
 use crate::vectors::Vector;
 use sdl2::pixels::Color;
 use std::sync::LazyLock; //Black magic
@@ -273,29 +273,185 @@ pub static SCENE5: LazyLock<Scene> = LazyLock::new(|| {
 
 pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
-        vec![Sphere::make(
-            &Vector::make(-5., -5., -5.),
-            0.5,
-            Material {
-                color: ColorType::Solid(Color::RGB(255, 100, 255)),
-                reflectivity: 0.3,
+        vec![Sphere {
+                center: Vector::make(0.0, 0.0, 0.0),
+                radius: 0.1,
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(0, 0, 0)),
+                    reflectivity: 0.0,
+                },
+            },Sphere {
+                center: Vector::make(1.0, 0.0, 0.0),
+                radius: 0.1,
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(255, 0, 0)),
+                    reflectivity: 0.0,
+                },
+            },Sphere {
+                center: Vector::make(0.0, 1.0, 0.0),
+                radius: 0.1,
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(0, 255, 0)),
+                    reflectivity: 0.0,
+                },
+            },Sphere {
+                center: Vector::make(0.0, 0.0, 1.0),
+                radius: 0.1,
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(0, 0, 255)),
+                    reflectivity: 0.0,
+                },
+            },Sphere {
+                center: Vector::make(1.0, 1.0, 0.0),
+                radius: 0.1,
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(255, 255, 0)),
+                    reflectivity: 0.0,
+                },
             },
-        )],
-        vec![Triangle::make(
-            Vector::make(0.5, -0.5, -0.5),
-            Vector::make(1.5, 0.5, 0.5),
-            Vector::make(1., 1., -1.),
-            Material {
-                color: ColorType::Solid(Color::RGB(255, 100, 255)),
-                reflectivity: 0.3,
-            },
-        )],
+            Sphere {
+                center: Vector::make(0.0, 1.0, 1.0),
+                radius: 0.1,
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(0, 255, 255)),
+                    reflectivity: 0.0,
+                },
+            },Sphere {
+                center: Vector::make(1.0, 0.0, 1.0),
+                radius: 0.1,
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(255,0, 255)),
+                    reflectivity: 0.0,
+                },
+            },Sphere {
+                center: Vector::make(1.0, 1.0, 1.0),
+                radius: 0.1,
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(255, 255, 255)),
+                    reflectivity: 0.0,
+                },
+            }],
+        vec![
+            Triangle::make(
+                Vector::make(1.0, 0.0, 0.0),
+                Vector::make(0.0, 1.0, 0.0),
+                Vector::make(0.0, 0.0, 0.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(255, 0, 0)),
+                    reflectivity: 0.0,
+                },
+            ),
+            Triangle::make(
+                Vector::make(0.0, 1.0, 0.0),
+                Vector::make(1.0, 0.0, 0.0),
+                Vector::make(1.0,1.0, 0.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(255, 0, 0)),
+                    reflectivity: 0.0,
+                },
+            ),
+            Triangle::make(
+                Vector::make(0.0, 0.0, 1.0),
+                Vector::make(0.0, 1.0, 0.0),
+                Vector::make(0.0, 0.0, 0.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(0,255 , 0)),
+                    reflectivity: 0.0,
+                },
+            ),
+            Triangle::make(
+                Vector::make(0.0, 1.0, 0.0),
+                Vector::make(0.0, 0.0, 1.0),
+                Vector::make(0.0, 1.0, 1.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(0,255, 0)),
+                    reflectivity: 0.0,
+                },
+            ),
+            Triangle::make(
+                Vector::make(1.0, 0.0, 0.0),
+                Vector::make(0.0, 0.0, 1.0),
+                Vector::make(1.0, 0.0, 1.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(0, 0, 255)),
+                    reflectivity: 0.0,
+                },
+            ),
+            Triangle::make(
+                Vector::make(1.0, 0.0, 0.0),
+                Vector::make(0.0, 0.0, 1.0),
+                Vector::make(0.0, 0.0, 0.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(0, 0, 255)),
+                    reflectivity: 0.0,
+                },
+            ),
+            Triangle::make(
+                Vector::make(1.0, 0.0, 1.0),
+                Vector::make(0.0, 1.0, 1.0),
+                Vector::make(0.0, 0.0, 1.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(255,255 , 0)),
+                    reflectivity: 0.0,
+                },
+            ),
+            Triangle::make(
+                Vector::make(0.0, 1.0, 1.0),
+                Vector::make(1.0, 0.0, 1.0),
+                Vector::make(1.0,1.0, 1.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(255, 255, 0)),
+                    reflectivity: 0.0,
+                },
+            ),Triangle::make(
+                Vector::make(1.0, 0.0, 1.0),
+                Vector::make(1.0, 1.0, 0.0),
+                Vector::make(1.0, 0.0, 0.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(255,0 , 255)),
+                    reflectivity: 0.0,
+                },
+            ),
+            Triangle::make(
+                Vector::make(1.0, 1.0, 0.0),
+                Vector::make(1.0, 0.0, 1.0),
+                Vector::make(1.0, 1.0, 1.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(255,0, 255)),
+                    reflectivity: 0.0,
+                },
+            ),Triangle::make(
+                Vector::make(1.0, 1.0, 0.0),
+                Vector::make(0.0, 1.0, 1.0),
+                Vector::make(1.0, 1.0, 1.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(0, 255, 255)),
+                    reflectivity: 0.0,
+                },
+            ),
+            Triangle::make(
+                Vector::make(1.0, 1.0, 0.0),
+                Vector::make(0.0, 1.0, 1.0),
+                Vector::make(0.0, 1.0, 0.0),
+                Material {
+                    color: ColorType::Solid(Color::RGB(0, 255, 255)),
+                    reflectivity: 0.0,
+                },
+            ),
+        ],
         vec![],
         vec![Light {
             position: Vector::make(1., 1., 0.),
             intensity: 0.75,
         }],
-        0.2,
+        1.0,
     )
 });
-
+//    Vector::make(-1.0, -1.0, -1.0),
+//    Vector::make(1.0, -1.0, -1.0),
+//    Vector::make(1.0, 1.0, -1.0),
+//    Vector::make(-1.0, 1.0, -1.0),
+//    Vector::make(-1.0, -1.0, 1.0),
+//    Vector::make(1.0, -1.0, 1.0),
+//    Vector::make(1.0, 1.0, 1.0),
+//    Vector::make(-1.0, 1.0, 1.0),

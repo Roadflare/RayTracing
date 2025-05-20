@@ -12,7 +12,7 @@ use camera::Camera;
 
 mod tests;
 
-const WIDTH: u16 = 1400;
+const WIDTH: u16 = 700;
 const ASPECT_RATIO: (u16, u16) = (16, 10);
 const GLOBINA: u32 = 2;
 
