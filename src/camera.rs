@@ -251,7 +251,23 @@ fn compute_lighting(scene: &Scene, point: Vector, normal: Vector) -> f64 {
 
         // Pomaknjena začetna točka, da se izognemo samo-senci
         let shadow_ray = Ray::new(point + normal * 0.001, light_dir);
-        let in_shadow = &shadow_ray.trace(scene).is_some();
+        let trace_res = &shadow_ray.trace(scene);
+
+        let light_distance = (light.position - point).length();
+        let mut in_shadow = false;
+
+        match trace_res {
+            Some(Collision::Sphere(_, point))
+            | Some(Collision::Triangle(_, point))
+            | Some(Collision::Plane(_, point))
+            => {
+                let distance = (*point - light_dir).length();
+                if distance < light_distance {
+                    in_shadow = true;
+                }
+            }
+            _ => {}
+        }
 
         if !in_shadow {
             let light_contrib = normal.dot(&light_dir).max(0.0) * light.intensity;
