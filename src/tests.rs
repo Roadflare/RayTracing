@@ -61,11 +61,7 @@ pub static SCENE2: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
             Sphere {
-                center: Vector {
-                    x: 3.0,
-                    y: 2.0,
-                    z: 0.0,
-                },
+                center: Vector::make(3.0, 2.0, 0.0),
                 radius: 1.0,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 0)),
@@ -73,11 +69,7 @@ pub static SCENE2: LazyLock<Scene> = LazyLock::new(|| {
                 },
             },
             Sphere {
-                center: Vector {
-                    x: 3.0,
-                    y: -1.0,
-                    z: 0.0,
-                },
+                center: Vector::make(3.0, -1.0, 0.0),
                 radius: 1.5,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 255)),
@@ -106,11 +98,7 @@ pub static SCENE3: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
             Sphere {
-                center: Vector {
-                    x: 0.0,
-                    y: 0.0,
-                    z: -1.5,
-                },
+                center: Vector::make(0.0, 0.0, -1.5),
                 radius: 0.5,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 0)),
@@ -118,11 +106,7 @@ pub static SCENE3: LazyLock<Scene> = LazyLock::new(|| {
                 },
             },
             Sphere {
-                center: Vector {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                },
+                center: Vector::make(0.0, 0.0, 0.0),
                 radius: 0.8,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 0)),
@@ -130,11 +114,7 @@ pub static SCENE3: LazyLock<Scene> = LazyLock::new(|| {
                 },
             },
             Sphere {
-                center: Vector {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 1.5,
-                },
+                center: Vector::make(0.0, 0.0, 1.5),
                 radius: 0.5,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 255)),
@@ -169,11 +149,7 @@ pub static SCENE4: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
             Sphere {
-                center: Vector {
-                    x: 0.0,
-                    y: 1.0,
-                    z: 1.0,
-                },
+                center: Vector::make(0.0, 1.0, 1.0),
                 radius: 0.7,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 0)),
@@ -181,11 +157,7 @@ pub static SCENE4: LazyLock<Scene> = LazyLock::new(|| {
                 },
             },
             Sphere {
-                center: Vector {
-                    x: 0.0,
-                    y: 1.0,
-                    z: -1.0,
-                },
+                center: Vector::make(0.0, 1.0, -1.0),
                 radius: 0.7,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 0)),
@@ -193,11 +165,7 @@ pub static SCENE4: LazyLock<Scene> = LazyLock::new(|| {
                 },
             },
             Sphere {
-                center: Vector {
-                    x: 0.0,
-                    y: -1.0,
-                    z: 0.0,
-                },
+                center: Vector::make(0.0, -1.0, 0.0),
                 radius: 0.7,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 255)),
@@ -225,11 +193,7 @@ pub static SCENE5: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
             Sphere {
-                center: Vector {
-                    x: 0.5,
-                    y: 0.0,
-                    z: -1.0,
-                },
+                center: Vector::make(0.5, 0.0, -1.0),
                 radius: 1.0,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(144, 144, 144)),
@@ -237,11 +201,7 @@ pub static SCENE5: LazyLock<Scene> = LazyLock::new(|| {
                 },
             },
             Sphere {
-                center: Vector {
-                    x: 0.5,
-                    y: 0.0,
-                    z: -3.0,
-                },
+                center: Vector::make(0.5, 0.0, -3.0),
                 radius: 0.5,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 255)),
@@ -249,11 +209,7 @@ pub static SCENE5: LazyLock<Scene> = LazyLock::new(|| {
                 },
             },
             Sphere {
-                center: Vector {
-                    x: 0.5,
-                    y: 0.0,
-                    z: 2.0,
-                },
+                center: Vector::make(0.5, 0.0, 2.0),
                 radius: 1.5,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 255)),
@@ -273,35 +229,40 @@ pub static SCENE5: LazyLock<Scene> = LazyLock::new(|| {
 
 pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
-        vec![Sphere {
+        vec![
+            Sphere {
                 center: Vector::make(0.0, 0.0, 0.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 0)),
                     reflectivity: 0.0,
                 },
-            },Sphere {
+            },
+            Sphere {
                 center: Vector::make(1.0, 0.0, 0.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 0)),
                     reflectivity: 0.0,
                 },
-            },Sphere {
+            },
+            Sphere {
                 center: Vector::make(0.0, 1.0, 0.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 0)),
                     reflectivity: 0.0,
                 },
-            },Sphere {
+            },
+            Sphere {
                 center: Vector::make(0.0, 0.0, 1.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 255)),
                     reflectivity: 0.0,
                 },
-            },Sphere {
+            },
+            Sphere {
                 center: Vector::make(1.0, 1.0, 0.0),
                 radius: 0.1,
                 material: Material {
@@ -316,21 +277,24 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
                     color: ColorType::Solid(Color::RGB(0, 255, 255)),
                     reflectivity: 0.0,
                 },
-            },Sphere {
+            },
+            Sphere {
                 center: Vector::make(1.0, 0.0, 1.0),
                 radius: 0.1,
                 material: Material {
-                    color: ColorType::Solid(Color::RGB(255,0, 255)),
+                    color: ColorType::Solid(Color::RGB(255, 0, 255)),
                     reflectivity: 0.0,
                 },
-            },Sphere {
+            },
+            Sphere {
                 center: Vector::make(1.0, 1.0, 1.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 255)),
                     reflectivity: 0.0,
                 },
-            }],
+            },
+        ],
         vec![
             Triangle::make(
                 Vector::make(1.0, 0.0, 0.0),
@@ -344,7 +308,7 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
             Triangle::make(
                 Vector::make(0.0, 1.0, 0.0),
                 Vector::make(1.0, 0.0, 0.0),
-                Vector::make(1.0,1.0, 0.0),
+                Vector::make(1.0, 1.0, 0.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 0)),
                     reflectivity: 0.0,
@@ -355,7 +319,7 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
                 Vector::make(0.0, 1.0, 0.0),
                 Vector::make(0.0, 0.0, 0.0),
                 Material {
-                    color: ColorType::Solid(Color::RGB(0,255 , 0)),
+                    color: ColorType::Solid(Color::RGB(0, 255, 0)),
                     reflectivity: 0.0,
                 },
             ),
@@ -364,7 +328,7 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
                 Vector::make(0.0, 0.0, 1.0),
                 Vector::make(0.0, 1.0, 1.0),
                 Material {
-                    color: ColorType::Solid(Color::RGB(0,255, 0)),
+                    color: ColorType::Solid(Color::RGB(0, 255, 0)),
                     reflectivity: 0.0,
                 },
             ),
@@ -391,24 +355,25 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
                 Vector::make(0.0, 1.0, 1.0),
                 Vector::make(0.0, 0.0, 1.0),
                 Material {
-                    color: ColorType::Solid(Color::RGB(255,255 , 0)),
+                    color: ColorType::Solid(Color::RGB(255, 255, 0)),
                     reflectivity: 0.0,
                 },
             ),
             Triangle::make(
                 Vector::make(0.0, 1.0, 1.0),
                 Vector::make(1.0, 0.0, 1.0),
-                Vector::make(1.0,1.0, 1.0),
+                Vector::make(1.0, 1.0, 1.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 0)),
                     reflectivity: 0.0,
                 },
-            ),Triangle::make(
+            ),
+            Triangle::make(
                 Vector::make(1.0, 0.0, 1.0),
                 Vector::make(1.0, 1.0, 0.0),
                 Vector::make(1.0, 0.0, 0.0),
                 Material {
-                    color: ColorType::Solid(Color::RGB(255,0 , 255)),
+                    color: ColorType::Solid(Color::RGB(255, 0, 255)),
                     reflectivity: 0.0,
                 },
             ),
@@ -417,10 +382,11 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
                 Vector::make(1.0, 0.0, 1.0),
                 Vector::make(1.0, 1.0, 1.0),
                 Material {
-                    color: ColorType::Solid(Color::RGB(255,0, 255)),
+                    color: ColorType::Solid(Color::RGB(255, 0, 255)),
                     reflectivity: 0.0,
                 },
-            ),Triangle::make(
+            ),
+            Triangle::make(
                 Vector::make(1.0, 1.0, 0.0),
                 Vector::make(0.0, 1.0, 1.0),
                 Vector::make(1.0, 1.0, 1.0),
