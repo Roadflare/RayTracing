@@ -257,11 +257,11 @@ fn compute_lighting(scene: &Scene, point: Vector, normal: Vector) -> f64 {
         let mut in_shadow = false;
 
         match trace_res {
-            Some(Collision::Sphere(_, point))
-            | Some(Collision::Triangle(_, point))
-            | Some(Collision::Plane(_, point))
+            Some(Collision::Sphere(_, p))
+            | Some(Collision::Triangle(_, p))
+            | Some(Collision::Plane(_, p))
             => {
-                let distance = (*point - light_dir).length();
+                let distance = (*p - point).length();
                 if distance < light_distance {
                     in_shadow = true;
                 }
