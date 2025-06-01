@@ -1,6 +1,6 @@
 use crate::vectors::Vector;
 use sdl2::pixels::Color;
-
+use image::RgbImage;
 pub struct Scene {
     pub spheres: Vec<Sphere>,
     pub triangles: Vec<Triangle>,
@@ -53,7 +53,7 @@ pub struct Material {
 
 pub enum ColorType {
     Solid(Color),
-    Function(fn(Vector) -> Color), //skalarno polje za barvo
+    Function(Box<dyn Fn(Vector) -> Color + Send + Sync>), // Send in sync sta zaradi thread safety-ja ker uporabljamo lazylock 
 }
 
 pub struct Triangle {
@@ -86,7 +86,40 @@ impl Triangle {
 }
 
 pub struct Plane {
-    pub point: Vector,  // Točka na ravnini
-    pub normal: Vector, // Normala (naj bo normirana)
+    pub point: Vector,  
+    pub normal: Vector, 
     pub material: Material,
+}
+
+pub struct Texture {
+    image: RgbImage,
+    width: u32,
+    height: u32,
+}
+
+impl Texture {
+    pub fn from_file(path: &str) -> Texture {
+        let img = image::open(path).expect("Failed to load texture").to_rgb8();
+        let (w, h) = img.dimensions();
+        Texture {
+            image: img,
+            width: w,
+            height: h,
+        }
+    }
+
+    pub fn uv_pixel_from_texture(&self, u: f64, v: f64) -> Color {
+        let x = (u.fract() * self.width as f64) as u32;
+        let y = ((1.0 - v.fract()) * self.height as f64) as u32;
+        let pixel = self
+            .image
+            .get_pixel(x.min(self.width - 1), y.min(self.height - 1));
+        Color::RGB(pixel[0], pixel[1], pixel[2])
+    }
+    pub fn sphere_uv(center: Vector, radius: f64, point: Vector) -> (f64, f64) {
+        let p = (point - center) / radius; 
+        let u = 0.5 - p.z.atan2(p.x) / (2.0 * std::f64::consts::PI);
+        let v = 0.5 + p.y.asin() / std::f64::consts::PI;
+        (u, v)
+    }
 }
