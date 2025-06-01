@@ -419,14 +419,6 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
         1.0,
     )
 });
-//    Vector::make(-1.0, -1.0, -1.0),
-//    Vector::make(1.0, -1.0, -1.0),
-//    Vector::make(1.0, 1.0, -1.0),
-//    Vector::make(-1.0, 1.0, -1.0),
-//    Vector::make(-1.0, -1.0, 1.0),
-//    Vector::make(1.0, -1.0, 1.0),
-//    Vector::make(1.0, 1.0, 1.0),
-//    Vector::make(-1.0, 1.0, 1.0),
 
 pub static SCENE_H: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
@@ -503,15 +495,15 @@ pub static SCENE_H: LazyLock<Scene> = LazyLock::new(|| {
     )
 });
 
-static SUN_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("src/sun.jpg"));
-static MERCURY_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("src/mercury.jpg"));
-static VENERA_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("src/venera.jpg"));
-static EARTH_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("src/earth.jpg"));
-static MARS_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("src/mars.jpg"));
-static JUPITER_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("src/jupiter.jpg"));
-static SATURN_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("src/saturn.jpg"));
-static URANUS_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("src/uranus.jpg"));
-static NEPTUNE_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("src/neptune.jpg"));
+static SUN_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/sun.jpg"));
+static MERCURY_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/mercury.jpg"));
+static VENERA_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/venera.jpg"));
+static EARTH_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/earth.jpg"));
+static MARS_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/mars.jpg"));
+static JUPITER_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/jupiter.jpg"));
+static SATURN_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/saturn.jpg"));
+static URANUS_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/uranus.jpg"));
+static NEPTUNE_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/neptune.jpg"));
 
 pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
