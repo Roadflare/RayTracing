@@ -3,6 +3,8 @@ use crate::vectors::Vector;
 use sdl2::pixels::Color;
 use std::sync::LazyLock; //Black magic
 
+static zero_vector: Vector = Vector{x: 0., y: 0., z: 0.};
+
 pub static SCENE1: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
@@ -421,3 +423,125 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
 //    Vector::make(1.0, -1.0, 1.0),
 //    Vector::make(1.0, 1.0, 1.0),
 //    Vector::make(-1.0, 1.0, 1.0),
+
+
+pub static SCENE_H: LazyLock<Scene> = LazyLock::new(|| {
+    Scene::make(
+        vec![
+            Sphere::make(&zero_vector, 1., Material{
+                color: ColorType::Solid(Color::RGB(30, 30, 30)),
+                reflectivity: 0.05})
+        ],
+        vec![],
+        vec![
+            Plane{
+                point: Vector::make(3., 0., 0.),
+                normal: Vector::make(-1., 0., 0.),
+                material: Material{
+                    color: ColorType::Solid(Color::RGB(255, 150, 150)),
+                    reflectivity: 0.95
+                }
+            },
+            Plane{
+                point: Vector::make(-3., 0., 0.),
+                normal: Vector::make(1., 0., 0.),
+                material: Material{
+                    color: ColorType::Solid(Color::RGB(150, 255, 255)),
+                    reflectivity: 0.95
+                }
+            },
+            Plane{
+                point: Vector::make(0., 3., 0.),
+                normal: Vector::make(0., -1., 0.),
+                material: Material{
+                    color: ColorType::Solid(Color::RGB(150, 255, 150)),
+                    reflectivity: 0.95
+                }
+            },
+            Plane{
+                point: Vector::make(0., -3., 0.),
+                normal: Vector::make(0., 1., 0.),
+                material: Material{
+                    color: ColorType::Solid(Color::RGB(255, 150, 255)),
+                    reflectivity: 0.95
+                }
+            },
+            Plane{
+                point: Vector::make(0., 0., 3.),
+                normal: Vector::make(0., 0., -1.),
+                material: Material{
+                    color: ColorType::Solid(Color::RGB(150, 150, 255)),
+                    reflectivity: 0.95
+                }
+            },
+            Plane{
+                point: Vector::make(0., 0., -3.),
+                normal: Vector::make(0., 0., 1.),
+                material: Material{
+                    color: ColorType::Solid(Color::RGB(255, 255, 150)),
+                    reflectivity: 0.95
+                }
+            }
+            
+        ],
+        vec![
+            Light{
+                position: Vector::make(2., 0., 0.),
+                intensity: 1.
+            },
+            Light{
+                position: Vector::make(-2., 0., 0.),
+                intensity: 1.
+            }
+        ],
+        0.5
+    )});
+
+
+    pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
+        Scene::make(
+            vec![
+                // Earth
+                Sphere::make(&zero_vector, 4., Material{
+                    color: ColorType::Solid(Color::RGB(0, 255, 150)),
+                    reflectivity: 0.03
+                }),
+                // Moon
+                Sphere::make(&Vector::make(6., 0., -4.), 1., Material{
+                    color: ColorType::Solid(Color::RGB(255, 255, 255)),
+                    reflectivity: 0.3
+                }),
+                // Sun
+                Sphere::make(&Vector::make(1000., 50., 100.), 100., Material{
+                    color: ColorType::Solid(Color::RGB(255, 255, 100)),
+                    reflectivity: 0.
+                }),
+            ],
+            vec![],
+            vec![
+                Plane{
+                    point: Vector::make(5000., 0., 0.),
+                    normal: Vector::make(-1., 0., 0.),
+                    material: Material{
+                        color: ColorType::Solid(Color::RGB(0, 0, 0)),
+                        reflectivity: 0.
+                    }
+                },
+                Plane{
+                    point: Vector::make(-5000., 0., 0.),
+                    normal: Vector::make(1., 0., 0.),
+                    material: Material{
+                        color: ColorType::Solid(Color::RGB(0, 0, 0)),
+                        reflectivity: 0.
+                    }
+                }
+            ],
+            vec![
+                Light{
+                    position: Vector::make(900., 45., 90.),
+                    intensity: 1.
+                }
+            ],
+            0.
+        )
+    });

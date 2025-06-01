@@ -64,7 +64,7 @@ pub struct Triangle {
 
 pub struct Light {
     pub position: Vector,
-    pub intensity: f64, // od 0.0 do 1.0
+    pub intensity: f64, // between 0.0 and 1.0
 }
 
 pub enum Collision<'a> {

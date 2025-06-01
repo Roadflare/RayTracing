@@ -12,9 +12,9 @@ use camera::Camera;
 
 mod tests;
 
-const WIDTH: u16 = 700;
+const WIDTH: u16 = 1000;
 const ASPECT_RATIO: (u16, u16) = (16, 10);
-const GLOBINA: u32 = 2;
+const GLOBINA: u32 = 20;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -62,6 +62,8 @@ fn main() -> Result<(), String> {
                     Keycode::Num4 => scene = &tests::SCENE4,
                     Keycode::Num5 => scene = &tests::SCENE5,
                     Keycode::Num6 => scene = &tests::SCENE6,
+                    Keycode::H => scene = &tests::SCENE_H,
+                    Keycode::J => scene = &tests::SCENE_J,
 
                     Keycode::W
                     | Keycode::A
