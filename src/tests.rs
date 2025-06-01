@@ -496,14 +496,21 @@ pub static SCENE_H: LazyLock<Scene> = LazyLock::new(|| {
 });
 
 static SUN_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/sun.jpg"));
-static MERCURY_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/mercury.jpg"));
-static VENERA_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/venera.jpg"));
-static EARTH_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/earth.jpg"));
+static MERCURY_TEXTURE: LazyLock<Texture> =
+    LazyLock::new(|| Texture::from_file("textures/mercury.jpg"));
+static VENERA_TEXTURE: LazyLock<Texture> =
+    LazyLock::new(|| Texture::from_file("textures/venera.jpg"));
+static EARTH_TEXTURE: LazyLock<Texture> =
+    LazyLock::new(|| Texture::from_file("textures/earth.jpg"));
 static MARS_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/mars.jpg"));
-static JUPITER_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/jupiter.jpg"));
-static SATURN_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/saturn.jpg"));
-static URANUS_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/uranus.jpg"));
-static NEPTUNE_TEXTURE: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/neptune.jpg"));
+static JUPITER_TEXTURE: LazyLock<Texture> =
+    LazyLock::new(|| Texture::from_file("textures/jupiter.jpg"));
+static SATURN_TEXTURE: LazyLock<Texture> =
+    LazyLock::new(|| Texture::from_file("textures/saturn.jpg"));
+static URANUS_TEXTURE: LazyLock<Texture> =
+    LazyLock::new(|| Texture::from_file("textures/uranus.jpg"));
+static NEPTUNE_TEXTURE: LazyLock<Texture> =
+    LazyLock::new(|| Texture::from_file("textures/neptune.jpg"));
 
 pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
@@ -641,5 +648,85 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
             intensity: 1.,
         }],
         1.,
+    )
+});
+
+static PEAK: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/peak.jpg"));
+
+pub static PEAK_K: LazyLock<Scene> = LazyLock::new(|| {
+    Scene::make(
+        vec![Sphere::make(
+            &ZERO_VECTOR,
+            1.,
+            Material {
+                color: ColorType::Function(Box::new(move |point: Vector| {
+                    let (u, v) = Texture::sphere_uv(ZERO_VECTOR, 2., point);
+                    PEAK.uv_pixel_from_texture(u, v)
+                })),
+                reflectivity: 0.0,
+            },
+        )],
+        vec![],
+        vec![
+            Plane {
+                point: Vector::make(3., 0., 0.),
+                normal: Vector::make(-1., 0., 0.),
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(255, 150, 150)),
+                    reflectivity: 0.80,
+                },
+            },
+            Plane {
+                point: Vector::make(-3., 0., 0.),
+                normal: Vector::make(1., 0., 0.),
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(150, 255, 255)),
+                    reflectivity: 0.80,
+                },
+            },
+            Plane {
+                point: Vector::make(0., 3., 0.),
+                normal: Vector::make(0., -1., 0.),
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(150, 255, 150)),
+                    reflectivity: 0.80,
+                },
+            },
+            Plane {
+                point: Vector::make(0., -3., 0.),
+                normal: Vector::make(0., 1., 0.),
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(255, 150, 255)),
+                    reflectivity: 0.80,
+                },
+            },
+            Plane {
+                point: Vector::make(0., 0., 3.),
+                normal: Vector::make(0., 0., -1.),
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(150, 150, 255)),
+                    reflectivity: 0.80,
+                },
+            },
+            Plane {
+                point: Vector::make(0., 0., -3.),
+                normal: Vector::make(0., 0., 1.),
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(255, 255, 150)),
+                    reflectivity: 0.80,
+                },
+            },
+        ],
+        vec![
+            Light {
+                position: Vector::make(2., 0., 0.),
+                intensity: 1.,
+            },
+            Light {
+                position: Vector::make(-2., 0., 0.),
+                intensity: 1.,
+            },
+        ],
+        0.7,
     )
 });

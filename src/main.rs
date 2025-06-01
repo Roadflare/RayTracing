@@ -14,7 +14,7 @@ mod tests;
 
 const WIDTH: u16 = 1000;
 const ASPECT_RATIO: (u16, u16) = (16, 10);
-const GLOBINA: u32 = 20;
+const GLOBINA: u32 = 3;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -30,7 +30,7 @@ fn main() -> Result<(), String> {
 
     let mut scene = &tests::SCENE1;
 
-    let mut camera = Camera::new(Vector::make(-3.0, 0.0, 0.0), Vector::make(1.0, 0.0, 0.0));
+    let mut camera = Camera::new(Vector::make(3.0, 0.0, 0.0), Vector::make(-1.0, 0.0, 0.0));
 
     camera.draw(&mut canvas, &scene, WIDTH, ASPECT_RATIO, GLOBINA);
     canvas.present();
@@ -53,6 +53,7 @@ fn main() -> Result<(), String> {
                     Keycode::Num6 => scene = &tests::SCENE6,
                     Keycode::H => scene = &tests::SCENE_H,
                     Keycode::J => scene = &tests::SCENE_J,
+                    Keycode::K => scene = &tests::PEAK_K,
 
                     Keycode::W
                     | Keycode::A
