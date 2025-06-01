@@ -55,6 +55,13 @@ impl Camera {
         }
     }
 
+    pub fn unepic(&self) -> Self {
+        Camera::new(Vector::make(-3.0, 0.0, 0.0), Vector::make(1.0, 0.0, 0.0))
+    }
+    pub fn epic(&self) -> Self {
+        Camera::new(Vector::make(3.0, 0.0, 0.0), Vector::make(-1.0, 0.0, 0.0))
+    }
+
     pub fn rotate(&self, angle_degrees: f64) -> Self {
         let angle_rad = angle_degrees.to_radians();
         let cos_theta = angle_rad.cos();
@@ -171,7 +178,7 @@ fn trace_color(scene: &Scene, ray: &Ray, y: u16, height: u16, depth: u32) -> Opt
 }
 
 fn handle_hit(
-    point: Vector,
+    point_of_colision: Vector,
     normal: Vector,
     material: &Material,
     scene: &Scene,
@@ -180,18 +187,18 @@ fn handle_hit(
     height: u16,
     depth: u32,
 ) -> Color {
-    let brightness = compute_lighting(scene, point, normal);
+    let brightness = compute_lighting(scene, point_of_colision, normal);
 
     let base_color = match &material.color {
         ColorType::Solid(c) => *c,
-        ColorType::Function(f) => f(point),
+        ColorType::Function(f) => f(point_of_colision),
     };
 
     let reflectivity = material.reflectivity;
 
     if reflectivity > 0.0 {
         let reflected_dir = ray.direction.reflect(&normal).normalized();
-        let reflected_ray = Ray::new(point + normal * 0.001, reflected_dir);
+        let reflected_ray = Ray::new(point_of_colision + normal * 0.001, reflected_dir);
         let reflected_color = trace_color(scene, &reflected_ray, y, height, depth - 1);
         if reflected_color.is_none() {
             return blend_colors(
@@ -233,24 +240,24 @@ fn blend_colors(base: Color, reflected: Color, brightness: f64, reflectivity: f6
     )
 }
 
-fn compute_lighting(scene: &Scene, point: Vector, normal: Vector) -> f64 {
+fn compute_lighting(scene: &Scene, point_of_colision: Vector, normal_of_hit_object: Vector) -> f64 {
     let mut brightness = scene.ambient_light;
 
     for light in &scene.lights {
-        let light_dir = (light.position - point).normalized();
+        let light_dir = (light.position - point_of_colision).normalized();
 
         // Pomaknjena začetna točka, da se izognemo samo-senci
-        let shadow_ray = Ray::new(point + normal * 0.001, light_dir);
+        let shadow_ray = Ray::new(point_of_colision + normal_of_hit_object * 0.001, light_dir);
         let trace_res = &shadow_ray.trace(scene);
 
-        let light_distance = (light.position - point).length();
+        let light_distance = (light.position - point_of_colision).length();
         let mut in_shadow = false;
 
         match trace_res {
             Some(Collision::Sphere(_, p))
             | Some(Collision::Triangle(_, p))
             | Some(Collision::Plane(_, p)) => {
-                let distance = (*p - point).length();
+                let distance = (*p - point_of_colision).length();
                 if distance < light_distance {
                     in_shadow = true;
                 }
@@ -259,7 +266,7 @@ fn compute_lighting(scene: &Scene, point: Vector, normal: Vector) -> f64 {
         }
 
         if !in_shadow {
-            let light_contrib = normal.dot(&light_dir).max(0.0) * light.intensity;
+            let light_contrib = normal_of_hit_object.dot(&light_dir).max(0.0) * light.intensity;
             brightness += light_contrib;
         }
     }
