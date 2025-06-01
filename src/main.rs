@@ -30,18 +30,7 @@ fn main() -> Result<(), String> {
 
     let mut scene = &tests::SCENE1;
 
-    let mut camera = Camera::new(
-        Vector {
-            x: -3.0,
-            y: 0.0,
-            z: 0.0,
-        },
-        Vector {
-            x: 1.0,
-            y: 0.0,
-            z: 0.0,
-        },
-    );
+    let mut camera = Camera::new(Vector::make(-3.0, 0.0, 0.0), Vector::make(1.0, 0.0, 0.0));
 
     camera.draw(&mut canvas, &scene, WIDTH, ASPECT_RATIO, GLOBINA);
     canvas.present();

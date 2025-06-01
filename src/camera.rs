@@ -35,21 +35,11 @@ impl Camera {
 
         match keycode {
             Keycode::W => {
-                let forward = Vector {
-                    x: base.forward.x,
-                    y: 0.0,
-                    z: base.forward.z,
-                }
-                .normalized();
+                let forward = Vector::make(base.forward.x, 0.0, base.forward.z).normalized();
                 movement = movement + forward;
             }
             Keycode::S => {
-                let backward = Vector {
-                    x: base.forward.x,
-                    y: 0.0,
-                    z: base.forward.z,
-                }
-                .normalized();
+                let backward = Vector::make(base.forward.x, 0.0, base.forward.z).normalized();
                 movement = movement - backward;
             }
             Keycode::A => movement = movement - base.right,
@@ -71,11 +61,11 @@ impl Camera {
         let sin_theta = angle_rad.sin();
 
         let dir = self.direction;
-        let new_direction = Vector {
-            x: dir.x * cos_theta - dir.z * sin_theta,
-            y: dir.y,
-            z: dir.x * sin_theta + dir.z * cos_theta,
-        }
+        let new_direction = Vector::make(
+            dir.x * cos_theta - dir.z * sin_theta,
+            dir.y,
+            dir.x * sin_theta + dir.z * cos_theta,
+        )
         .normalized();
 
         Camera {
@@ -259,8 +249,7 @@ fn compute_lighting(scene: &Scene, point: Vector, normal: Vector) -> f64 {
         match trace_res {
             Some(Collision::Sphere(_, p))
             | Some(Collision::Triangle(_, p))
-            | Some(Collision::Plane(_, p))
-            => {
+            | Some(Collision::Plane(_, p)) => {
                 let distance = (*p - point).length();
                 if distance < light_distance {
                     in_shadow = true;
