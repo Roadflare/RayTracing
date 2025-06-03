@@ -68,9 +68,12 @@ pub static SCENE2: LazyLock<Scene> = LazyLock::new(|| {
         vec![
             Sphere {
                 center: Vector::make(3.0, 2.0, 0.0),
-                radius: 1.0,
+                radius: 400.0,
                 material: Material {
-                    color: ColorType::Solid(Color::RGB(0, 255, 0)),
+                    color: ColorType::Function(Box::new(move |point: Vector| {
+                        let (u, v) = Texture::sphere_uv(Vector::make(3.0, 2.0, 0.0), 400., point);
+                        SUN_TEXTURE.uv_pixel_from_texture(u, v)
+                    })),
                     reflectivity: 0.0,
                 },
             },

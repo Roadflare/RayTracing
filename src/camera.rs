@@ -144,7 +144,7 @@ fn trace_color(scene: &Scene, ray: &Ray, y: u16, height: u16, depth: u32) -> Opt
     match ray.trace(scene) {
         Some(Collision::Sphere(sphere, point)) => Some(handle_hit(
             point,
-            sphere.normal(point),
+            sphere.normal(point, ray.direction),
             &sphere.material,
             scene,
             ray,
@@ -277,12 +277,11 @@ fn compute_lighting(scene: &Scene, point_of_colision: Vector, normal_of_hit_obje
 fn background_color(dir: Vector) -> Color {
     let t = ((dir.y + 1.0) * 0.5).clamp(0.0, 1.0);
 
-    // Preliv med spodaj (temno modra) in zgoraj (svetla rožnata)
-    let bottom = (50.0, 80.0, 160.0);
-    let top = (255.0, 200.0, 180.0);
+    let top = (0., 0.0, 128.0);
+    let bottom = (135., 206., 235.);
 
     let r = (1.0 - t) * bottom.0 + t * top.0;
-    let g = 255;
+    let g = 155;
     let b = (1.0 - t) * bottom.2 + t * top.2;
 
     Color::RGB(r as u8, g as u8, b as u8)
@@ -366,8 +365,18 @@ impl Ray {
         if discriminant < 0.0 {
             None
         } else {
-            let dist = (-b - discriminant.sqrt()) / (2.0 * a);
-            if dist > 0.0 { Some(dist) } else { None }
+            let sqrt_d = discriminant.sqrt();
+            let t1 = (-b - sqrt_d) / (2.0 * a);
+            let t2 = (-b + sqrt_d) / (2.0 * a);
+
+            // Vzemi najbližji pozitiven t
+            if t1 > 0.001 {
+                Some(t1)
+            } else if t2 > 0.001 {
+                Some(t2)
+            } else {
+                None
+            }
         }
     }
 

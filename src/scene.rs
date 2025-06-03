@@ -1,6 +1,6 @@
 use crate::vectors::Vector;
-use sdl2::pixels::Color;
 use image::RgbImage;
+use sdl2::pixels::Color;
 pub struct Scene {
     pub spheres: Vec<Sphere>,
     pub triangles: Vec<Triangle>,
@@ -41,8 +41,10 @@ impl Sphere {
         }
     }
 
-    pub fn normal(&self, point: Vector) -> Vector {
-        (point - self.center) / self.radius
+    pub fn normal(&self, point: Vector, ray_direction: Vector) -> Vector {
+        let n = (point - self.center) / self.radius;
+
+        if n.dot(&ray_direction) > 0.0 { -n } else { n }
     }
 }
 
@@ -53,7 +55,7 @@ pub struct Material {
 
 pub enum ColorType {
     Solid(Color),
-    Function(Box<dyn Fn(Vector) -> Color + Send + Sync>), // Send in sync sta zaradi thread safety-ja ker uporabljamo lazylock 
+    Function(Box<dyn Fn(Vector) -> Color + Send + Sync>), // Send in sync sta zaradi thread safety-ja ker uporabljamo lazylock
 }
 
 pub struct Triangle {
@@ -86,8 +88,8 @@ impl Triangle {
 }
 
 pub struct Plane {
-    pub point: Vector,  
-    pub normal: Vector, 
+    pub point: Vector,
+    pub normal: Vector,
     pub material: Material,
 }
 
@@ -117,7 +119,7 @@ impl Texture {
         Color::RGB(pixel[0], pixel[1], pixel[2])
     }
     pub fn sphere_uv(center: Vector, radius: f64, point: Vector) -> (f64, f64) {
-        let p = (point - center) / radius; 
+        let p = (point - center) / radius;
         let u = 0.5 - p.z.atan2(p.x) / (2.0 * std::f64::consts::PI);
         let v = 0.5 + p.y.asin() / std::f64::consts::PI;
         (u, v)
