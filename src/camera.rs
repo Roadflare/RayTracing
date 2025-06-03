@@ -277,9 +277,6 @@ fn compute_lighting(scene: &Scene, point_of_colision: Vector, normal_of_hit_obje
 fn background_color(dir: Vector) -> Color {
     let t = ((dir.y + 1.0) * 0.5).clamp(0.0, 1.0);
 
-
-    let  top= (0., 0.0, 128.0);
-    let bottom = (135., 206., 235.);
     let top = (0., 0.0, 128.0);
     let bottom = (135., 206., 235.);
 
