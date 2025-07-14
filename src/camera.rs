@@ -4,6 +4,9 @@ use crate::vectors::Vector;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 
+
+const UP : Vector = Vector{x: 0., y: 1., z: 0.};
+
 pub struct Camera {
     // Global camera position and orientation
     pub coords: Vector,
@@ -13,8 +16,7 @@ pub struct Camera {
 struct CameraBasis {
     // Relative orientation of the camera
     forward: Vector,
-    right: Vector,
-    up: Vector,
+    right: Vector
 }
 
 impl Camera {
@@ -82,14 +84,11 @@ impl Camera {
     }
 
     fn camera_basis(&self) -> CameraBasis {
-        let up = Vector::make(0.0, 1.0, 0.0);
         let forward = self.direction;
-        let right = forward.cross(&up).normalized();
-        let true_up = right.cross(&forward).normalized();
+        let right = forward.cross(&UP).normalized();
         CameraBasis {
             forward,
-            right,
-            up: true_up,
+            right
         }
     }
 
@@ -106,7 +105,7 @@ impl Camera {
         let v = (y as f64 + 0.5) / height as f64 - 0.5;
 
         let direction =
-            basis.forward + basis.right * (u * 2.0 * aspect_ratio) + basis.up * (-v * 2.0);
+            basis.forward + basis.right * (u * 2.0 * aspect_ratio) + UP * (-v * 2.0);
 
         Ray::new(self.coords, direction)
     }
