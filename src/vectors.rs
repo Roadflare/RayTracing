@@ -39,8 +39,30 @@ impl Vector {
             z: self.x * other.y - self.y * other.x,
         }
     }
+
+    pub fn angle_with(&self, other: &Vector) -> f64 {
+        f64::asin(self.normalized().dot(&other.normalized()))
+    }
+    
     pub fn reflect(&self, normal: &Vector) -> Vector {
         *self - *normal * 2.0 * self.dot(normal)
+    }
+
+    pub fn refract(&self, normal: &Vector, refraction_index: f64) -> Vector {
+        assert!(refraction_index > 0.);
+        let inciding_angle = self.angle_with(normal);
+        let mut refracted_angle = 0.;
+
+        if f64::sin(inciding_angle) > 0. {
+            refracted_angle = inciding_angle*refraction_index;
+        } else {
+            refracted_angle = inciding_angle/refraction_index;
+        }
+        let inciding_collinear = normal.mul(self.dot(normal));
+        let inciding_perpendicular = (*self - inciding_collinear).normalized();
+        let inciding_collinear = inciding_collinear.normalized();
+
+        inciding_collinear.mul(f64::cos(refracted_angle)) + inciding_perpendicular.mul(f64::sin(refracted_angle))
     }
 }
 

@@ -18,8 +18,8 @@ pub static SCENE1: LazyLock<Scene> = LazyLock::new(|| {
                 1.0,
                 Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 0)),
-                    reflectivity: Some(0.3),
-                    transparency: None
+                    reflectivity: None,
+                    transparency: Some((0.9, 1.3))
                 },
             ),
             // Rdeča sfera

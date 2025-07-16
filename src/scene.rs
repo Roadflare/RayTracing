@@ -56,7 +56,7 @@ pub struct Material {
 
 pub enum ColorType {
     Solid(Color),
-    Function(Box<dyn Fn(Vector) -> Color + Send + Sync>), // Send in sync sta zaradi thread safety-ja ker uporabljamo lazylock
+    Function(Box<dyn Fn(Vector) -> Color + Send + Sync>), // Send and Sync are safety features as LazyLock is used
 }
 
 pub struct Triangle {

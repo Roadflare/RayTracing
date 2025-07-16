@@ -193,27 +193,54 @@ fn handle_hit(
         ColorType::Function(f) => f(point_of_colision),
     };
 
-    let reflectivity = material.reflectivity;
+    let mut color = Color::RGB(0, 0, 0);
+    let mut refracted = false;
+    if let Some((transparency, refraction_index)) = material.transparency {
+        let refraction_dir = ray.direction.refract(&normal, refraction_index);
+        let refracted_ray = Ray{origin: point_of_colision + refraction_dir * 0.001, direction: refraction_dir};
+        let refracted_color = trace_color(scene, &refracted_ray, y, height, depth);
+        if refracted_color.is_none() {
+            color = blend_colors(
+                base_color,
+                background_color(refracted_ray.direction),
+                brightness,
+                transparency);
+        } else {
+            color = blend_colors(
+                base_color,
+                refracted_color.unwrap_or_else(|| background_color(ray.direction)),
+                brightness,
+                transparency,
+            );
+            refracted = true;
+        }
+    }
 
-    if let Some(rf) = reflectivity {
+    if let Some(reflectivity) = material.reflectivity {
         let reflected_dir = ray.direction.reflect(&normal).normalized();
         let reflected_ray = Ray::new(point_of_colision + normal * 0.001, reflected_dir);
         let reflected_color = trace_color(scene, &reflected_ray, y, height, depth - 1);
+        let mut display_color = Color::RGB(0, 0, 0);
         if reflected_color.is_none() {
-            return blend_colors(
+            display_color = blend_colors(
                 base_color,
                 background_color(reflected_dir),
                 brightness,
-                rf,
+                reflectivity,
+            );
+        } else {
+            display_color = blend_colors(
+                base_color,
+                reflected_color.unwrap_or_else(|| background_color(ray.direction)),
+                brightness,
+                reflectivity,
             );
         }
-
-        blend_colors(
-            base_color,
-            reflected_color.unwrap_or_else(|| background_color(ray.direction)),
-            brightness,
-            rf,
-        )
+        if refracted {
+            Color::RGB((color.r + display_color.r) / 2, (color.g + display_color.g) / 2, (color.b + display_color.b) / 2)
+        } else {
+            display_color
+        }
     } else {
         scale_color(base_color, brightness)
     }
@@ -361,21 +388,21 @@ impl Ray {
         let b = 2.0 * oc.dot(&self.direction);
         let c = oc.dot(&oc) - sphere.radius * sphere.radius;
         let discriminant: f64 = b * b - 4.0 * a * c;
-        if discriminant < 0.0 {
-            None
-        } else {
-            let sqrt_d = discriminant.sqrt();
-            let t1 = (-b - sqrt_d) / (2.0 * a);
-            let t2 = (-b + sqrt_d) / (2.0 * a);
+        if discriminant <= 0.0 {
+            return None
+        }
+        
+        let sqrt_d = discriminant.sqrt();
+        let t1 = (-b - sqrt_d) / (2.0 * a);
+        let t2 = (-b + sqrt_d) / (2.0 * a);
 
             // Vzemi najbližji pozitiven t
-            if t1 > 0.001 {
-                Some(t1)
-            } else if t2 > 0.001 {
-                Some(t2)
-            } else {
-                None
-            }
+        if t1 > 0.001 {
+            Some(t1)
+        } else if t2 > 0.001 {
+            Some(t2)
+        } else {
+            None
         }
     }
 
