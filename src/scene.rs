@@ -50,7 +50,8 @@ impl Sphere {
 
 pub struct Material {
     pub color: ColorType,
-    pub reflectivity: f64,
+    pub reflectivity: Option<f64>,
+    pub transparency: Option<(f64, f64)>
 }
 
 pub enum ColorType {

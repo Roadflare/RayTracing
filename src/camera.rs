@@ -195,7 +195,7 @@ fn handle_hit(
 
     let reflectivity = material.reflectivity;
 
-    if reflectivity > 0.0 {
+    if let Some(rf) = reflectivity {
         let reflected_dir = ray.direction.reflect(&normal).normalized();
         let reflected_ray = Ray::new(point_of_colision + normal * 0.001, reflected_dir);
         let reflected_color = trace_color(scene, &reflected_ray, y, height, depth - 1);
@@ -204,7 +204,7 @@ fn handle_hit(
                 base_color,
                 background_color(reflected_dir),
                 brightness,
-                reflectivity,
+                rf,
             );
         }
 
@@ -212,7 +212,7 @@ fn handle_hit(
             base_color,
             reflected_color.unwrap_or_else(|| background_color(ray.direction)),
             brightness,
-            reflectivity,
+            rf,
         )
     } else {
         scale_color(base_color, brightness)
