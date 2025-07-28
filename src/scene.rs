@@ -1,57 +1,33 @@
+use crate::camera::Ray;
 use crate::vectors::Vector;
 use image::RgbImage;
 use sdl2::pixels::Color;
 pub struct Scene {
-    pub spheres: Vec<Sphere>,
-    pub triangles: Vec<Triangle>,
-    pub planes: Vec<Plane>,
+    pub objects: Vec<Box<dyn Hittable>>,
     pub lights: Vec<Light>,
     pub ambient_light: f64,
 }
 
 impl Scene {
-    pub fn make(
-        spheres: Vec<Sphere>,
-        triangles: Vec<Triangle>,
-        planes: Vec<Plane>,
-        lights: Vec<Light>,
-        ambient_light: f64,
-    ) -> Scene {
+    pub fn make(objects: Vec<Box<dyn Hittable>>, lights: Vec<Light>, ambient_light: f64) -> Scene {
         Scene {
-            spheres,
-            triangles,
-            planes,
+            objects,
             lights,
             ambient_light,
         }
     }
 }
-pub struct Sphere {
-    pub center: Vector,
-    pub radius: f64,
-    pub material: Material,
-}
 
-impl Sphere {
-    pub fn make(center: &Vector, radius: f64, material: Material) -> Self {
-        Sphere {
-            center: *center,
-            radius: radius,
-            material: material,
-        }
-    }
-
-    pub fn normal(&self, point: Vector, ray_direction: Vector) -> Vector {
-        let n = (point - self.center) / self.radius;
-
-        if n.dot(&ray_direction) > 0.0 { -n } else { n }
-    }
+pub trait Hittable: Send + Sync {
+    fn hit(&self, ray: &Ray) -> Option<f64>;
+    fn normal(&self, point: Vector) -> Vector;
+    fn material(&self) -> &Material;
 }
 
 pub struct Material {
     pub color: ColorType,
     pub reflectivity: Option<f64>,
-    pub transparency: Option<(f64, f64)>
+    pub transparency: Option<(f64, f64)>,
 }
 
 pub enum ColorType {
@@ -59,39 +35,14 @@ pub enum ColorType {
     Function(Box<dyn Fn(Vector) -> Color + Send + Sync>), // Send and Sync are safety features as LazyLock is used
 }
 
-pub struct Triangle {
-    pub vertices: (Vector, Vector, Vector),
-    pub normal: Vector,
-    pub material: Material,
-}
-
 pub struct Light {
     pub position: Vector,
     pub intensity: f64, // between 0.0 and 1.0
 }
 
-pub enum Collision<'a> {
-    Sphere(&'a Sphere, Vector),
-    Triangle(&'a Triangle, Vector),
-    Plane(&'a Plane, Vector),
-}
-
-impl Triangle {
-    pub fn make(a: Vector, b: Vector, c: Vector, material: Material) -> Self {
-        let (v1, v2) = (b - a, c - a);
-        let n = v1.cross(&v2).normalized();
-        Triangle {
-            vertices: (a, b, c),
-            normal: n,
-            material: material,
-        }
-    }
-}
-
-pub struct Plane {
+pub struct Collision<'a> {
+    pub object: &'a dyn Hittable,
     pub point: Vector,
-    pub normal: Vector,
-    pub material: Material,
 }
 
 pub struct Texture {
@@ -124,5 +75,127 @@ impl Texture {
         let u = 0.5 - p.z.atan2(p.x) / (2.0 * std::f64::consts::PI);
         let v = 0.5 + p.y.asin() / std::f64::consts::PI;
         (u, v)
+    }
+}
+
+pub struct Sphere {
+    pub center: Vector,
+    pub radius: f64,
+    pub material: Material,
+}
+
+impl Sphere {
+    pub fn make(center: &Vector, radius: f64, material: Material) -> Self {
+        Sphere {
+            center: *center,
+            radius: radius,
+            material: material,
+        }
+    }
+}
+
+impl Hittable for Sphere {
+    fn hit(&self, ray: &Ray) -> Option<f64> {
+        let oc = ray.origin - self.center;
+        let a = ray.direction.dot(&ray.direction);
+        let b = 2.0 * oc.dot(&ray.direction);
+        let c = oc.dot(&oc) - self.radius * self.radius;
+        let discriminant = b * b - 4.0 * a * c;
+        if discriminant < 0.0 {
+            None
+        } else {
+            let dist = (-b - discriminant.sqrt()) / (2.0 * a);
+            if dist > 0.0 { Some(dist) } else { None }
+        }
+    }
+
+    fn normal(&self, point: Vector) -> Vector {
+        (point - self.center) / self.radius
+    }
+
+    fn material(&self) -> &Material {
+        &self.material
+    }
+}
+
+pub struct Triangle {
+    pub vertices: (Vector, Vector, Vector),
+    pub normal: Vector,
+    pub material: Material,
+}
+
+impl Triangle {
+    pub fn make(a: Vector, b: Vector, c: Vector, material: Material) -> Self {
+        let (v1, v2) = (b - a, c - a);
+        let n = v1.cross(&v2).normalized();
+        Triangle {
+            vertices: (a, b, c),
+            normal: n,
+            material: material,
+        }
+    }
+}
+impl Hittable for Triangle {
+    fn hit(&self, ray: &Ray) -> Option<f64> {
+        // algorithm from: https://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
+
+        let (v0, v1, v2) = self.vertices;
+        let (e1, e2) = (v1 - v0, v2 - v0);
+        let h = ray.direction.cross(&e2);
+        let a = e1.dot(&h);
+        if -0.00001 < a && a < 0.00001 {
+            return None;
+        }
+
+        let f = 1.0 / a;
+        let s = ray.origin - v0;
+        let u = f * s.dot(&h);
+        if u > 1. || u < 0. {
+            return None;
+        }
+
+        let q = s.cross(&e1);
+        let v = f * ray.direction.dot(&q);
+        if v < 0. || u + v > 1. {
+            return None;
+        }
+
+        let t = f * e2.dot(&q);
+        if t > 0.001 { Some(t) } else { None }
+    }
+    fn normal(&self, _: Vector) -> Vector {
+        self.normal
+    }
+    fn material(&self) -> &Material {
+        &self.material
+    }
+}
+
+pub struct Plane {
+    pub point: Vector,
+    pub normal: Vector,
+    pub material: Material,
+}
+impl Hittable for Plane {
+    fn hit(&self, ray: &Ray) -> Option<f64> {
+        let denom = self.normal.dot(&ray.direction);
+        if denom.abs() < 1e-6 {
+            return None; // Ray je vzporeden ravnini
+        }
+
+        let t = (self.point - ray.origin).dot(&self.normal) / denom;
+        if t > 0.0 {
+            Some(ray.origin + ray.direction * t)
+        } else {
+            None // Ravnina je za kamero
+        }
+        .map(|p| (p - ray.origin).length())
+    }
+
+    fn normal(&self, _: Vector) -> Vector {
+        self.normal
+    }
+    fn material(&self) -> &Material {
+        &self.material
     }
 }

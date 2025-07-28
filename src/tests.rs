@@ -13,46 +13,45 @@ pub static SCENE1: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
             // Zelena sfera
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(0.5, 0.0, -1.0),
                 1.0,
                 Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 0)),
                     reflectivity: None,
-                    transparency: Some((0.9, 1.3))
+                    transparency: Some((0.9, 1.3)),
                 },
-            ),
+            )),
             // Rdeča sfera
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(0.5, 0.0, -3.0),
                 0.5,
                 Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 0)),
                     reflectivity: Some(0.7),
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
             // Modra sfera
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(0.5, 0.0, 2.0),
                 1.5,
                 Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 255)),
                     reflectivity: Some(0.2),
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
+            Box::new(Plane {
+                point: Vector::make(0.0, -2.0, 0.0),
+                normal: Vector::make(0.0, 1.0, 0.0),
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(100, 100, 100)),
+                    reflectivity: None,
+                    transparency: None,
+                },
+            }),
         ],
-        vec![], // triangles
-        vec![Plane {
-            point: Vector::make(0.0, -2.0, 0.0),
-            normal: Vector::make(0.0, 1.0, 0.0),
-            material: Material {
-                color: ColorType::Solid(Color::RGB(100, 100, 100)),
-                reflectivity: None,
-                transparency: None
-            },
-        }],
         vec![
             Light {
                 position: Vector::make(0.5, 0.0, -5.0),
@@ -70,7 +69,7 @@ pub static SCENE1: LazyLock<Scene> = LazyLock::new(|| {
 pub static SCENE2: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
-            Sphere {
+            Box::new(Sphere {
                 center: Vector::make(3.0, 2.0, 0.0),
                 radius: 400.0,
                 material: Material {
@@ -79,29 +78,28 @@ pub static SCENE2: LazyLock<Scene> = LazyLock::new(|| {
                         SUN_TEXTURE.uv_pixel_from_texture(u, v)
                     })),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(3.0, -1.0, 0.0),
                 radius: 1.5,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
+            }),
+            Box::new(Plane {
+                point: Vector::make(0.0, -2.0, 0.0),
+                normal: Vector::make(0.0, 1.0, 0.0), // y = -1 ravnina
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(100, 100, 100)),
+                    reflectivity: None,
+                    transparency: None,
+                },
+            }),
         ],
-        vec![],
-        vec![Plane {
-            point: Vector::make(0.0, -2.0, 0.0),
-            normal: Vector::make(0.0, 1.0, 0.0), // y = -1 ravnina
-            material: Material {
-                color: ColorType::Solid(Color::RGB(100, 100, 100)),
-                reflectivity: None,
-                transparency: None
-            },
-        }],
         vec![Light {
             position: Vector::make(3.0, 15.0, 0.0),
             intensity: 1.0,
@@ -113,44 +111,43 @@ pub static SCENE2: LazyLock<Scene> = LazyLock::new(|| {
 pub static SCENE3: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
-            Sphere {
+            Box::new(Sphere {
                 center: Vector::make(0.0, 0.0, -1.5),
                 radius: 0.5,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 0)),
                     reflectivity: Some(0.3),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(0.0, 0.0, 0.0),
                 radius: 0.8,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 0)),
                     reflectivity: Some(0.3),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(0.0, 0.0, 1.5),
                 radius: 0.5,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 255)),
                     reflectivity: Some(0.3),
-                    transparency: None
+                    transparency: None,
                 },
-            },
+            }),
+            Box::new(Plane {
+                point: Vector::make(0.0, -2.0, 0.0),
+                normal: Vector::make(0.0, 1.0, 0.0), // y = -1 ravnina
+                material: Material {
+                    color: ColorType::Solid(Color::RGB(100, 100, 100)),
+                    reflectivity: None,
+                    transparency: None,
+                },
+            }),
         ],
-        vec![],
-        vec![Plane {
-            point: Vector::make(0.0, -2.0, 0.0),
-            normal: Vector::make(0.0, 1.0, 0.0), // y = -1 ravnina
-            material: Material {
-                color: ColorType::Solid(Color::RGB(100, 100, 100)),
-                reflectivity: None,
-                transparency: None
-            },
-        }],
         vec![
             Light {
                 position: Vector::make(0.0, 0.0, -5.0),
@@ -168,36 +165,34 @@ pub static SCENE3: LazyLock<Scene> = LazyLock::new(|| {
 pub static SCENE4: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
-            Sphere {
+            Box::new(Sphere {
                 center: Vector::make(0.0, 1.0, 1.0),
                 radius: 0.7,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 0)),
                     reflectivity: Some(0.3),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(0.0, 1.0, -1.0),
                 radius: 0.7,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 0)),
                     reflectivity: Some(0.3),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(0.0, -1.0, 0.0),
                 radius: 0.7,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 255)),
                     reflectivity: Some(0.3),
-                    transparency: None
+                    transparency: None,
                 },
-            },
+            }),
         ],
-        vec![],
-        vec![],
         vec![
             Light {
                 position: Vector::make(0.0, 2.0, -4.0),
@@ -215,36 +210,34 @@ pub static SCENE4: LazyLock<Scene> = LazyLock::new(|| {
 pub static SCENE5: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
-            Sphere {
+            Box::new(Sphere {
                 center: Vector::make(0.5, 0.0, -1.0),
                 radius: 1.0,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(144, 144, 144)),
                     reflectivity: Some(0.3),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(0.5, 0.0, -3.0),
                 radius: 0.5,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 255)),
                     reflectivity: Some(0.3),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(0.5, 0.0, 2.0),
                 radius: 1.5,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 255)),
                     reflectivity: Some(0.3),
-                    transparency: None
+                    transparency: None,
                 },
-            },
+            }),
         ],
-        vec![],
-        vec![],
         vec![Light {
             position: Vector::make(-5.0, 0.0, -20.0),
             intensity: 0.75,
@@ -256,202 +249,199 @@ pub static SCENE5: LazyLock<Scene> = LazyLock::new(|| {
 pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
-            Sphere {
+            Box::new(Sphere {
                 center: Vector::make(0.0, 0.0, 0.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(1.0, 0.0, 0.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(0.0, 1.0, 0.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(0.0, 0.0, 1.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(1.0, 1.0, 0.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(0.0, 1.0, 1.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(1.0, 0.0, 1.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Sphere {
+            }),
+            Box::new(Sphere {
                 center: Vector::make(1.0, 1.0, 1.0),
                 radius: 0.1,
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
-        ],
-        vec![
-            Triangle::make(
+            }),
+            Box::new(Triangle::make(
                 Vector::make(1.0, 0.0, 0.0),
                 Vector::make(0.0, 1.0, 0.0),
                 Vector::make(0.0, 0.0, 0.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(0.0, 1.0, 0.0),
                 Vector::make(1.0, 0.0, 0.0),
                 Vector::make(1.0, 1.0, 0.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(0.0, 0.0, 1.0),
                 Vector::make(0.0, 1.0, 0.0),
                 Vector::make(0.0, 0.0, 0.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(0.0, 1.0, 0.0),
                 Vector::make(0.0, 0.0, 1.0),
                 Vector::make(0.0, 1.0, 1.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(1.0, 0.0, 0.0),
                 Vector::make(0.0, 0.0, 1.0),
                 Vector::make(1.0, 0.0, 1.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(1.0, 0.0, 0.0),
                 Vector::make(0.0, 0.0, 1.0),
                 Vector::make(0.0, 0.0, 0.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(1.0, 0.0, 1.0),
                 Vector::make(0.0, 1.0, 1.0),
                 Vector::make(0.0, 0.0, 1.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(0.0, 1.0, 1.0),
                 Vector::make(1.0, 0.0, 1.0),
                 Vector::make(1.0, 1.0, 1.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(1.0, 0.0, 1.0),
                 Vector::make(1.0, 1.0, 0.0),
                 Vector::make(1.0, 0.0, 0.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(1.0, 1.0, 0.0),
                 Vector::make(1.0, 0.0, 1.0),
                 Vector::make(1.0, 1.0, 1.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(255, 0, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(1.0, 1.0, 0.0),
                 Vector::make(0.0, 1.0, 1.0),
                 Vector::make(1.0, 1.0, 1.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-            Triangle::make(
+            )),
+            Box::new(Triangle::make(
                 Vector::make(1.0, 1.0, 0.0),
                 Vector::make(0.0, 1.0, 1.0),
                 Vector::make(0.0, 1.0, 0.0),
                 Material {
                     color: ColorType::Solid(Color::RGB(0, 255, 255)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
         ],
-        vec![],
         vec![Light {
             position: Vector::make(1., 1., 0.),
             intensity: 0.75,
@@ -462,71 +452,70 @@ pub static SCENE6: LazyLock<Scene> = LazyLock::new(|| {
 
 pub static SCENE_H: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
-        vec![Sphere::make(
-            &ZERO_VECTOR,
-            1.,
-            Material {
-                color: ColorType::Solid(Color::RGB(30, 30, 30)),
-                reflectivity: Some(0.05),
-                transparency: None
-            },
-        )],
-        vec![],
         vec![
-            Plane {
+            Box::new(Sphere::make(
+                &ZERO_VECTOR,
+                1.,
+                Material {
+                    color: ColorType::Solid(Color::RGB(30, 30, 30)),
+                    reflectivity: Some(0.05),
+                    transparency: None,
+                },
+            )),
+            Box::new(Plane {
                 point: Vector::make(3., 0., 0.),
                 normal: Vector::make(-1., 0., 0.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 150, 150)),
                     reflectivity: Some(0.95),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(-3., 0., 0.),
                 normal: Vector::make(1., 0., 0.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(150, 255, 255)),
                     reflectivity: Some(0.95),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(0., 3., 0.),
                 normal: Vector::make(0., -1., 0.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(150, 255, 150)),
                     reflectivity: Some(0.95),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(0., -3., 0.),
                 normal: Vector::make(0., 1., 0.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 150, 255)),
                     reflectivity: Some(0.95),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(0., 0., 3.),
                 normal: Vector::make(0., 0., -1.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(150, 150, 255)),
                     reflectivity: Some(0.95),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(0., 0., -3.),
                 normal: Vector::make(0., 0., 1.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 150)),
                     reflectivity: Some(0.95),
-                    transparency: None
+                    transparency: None,
                 },
-            },
+            }),
         ],
         vec![
             Light {
@@ -563,7 +552,7 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
         vec![
             // Sun
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(13., 0., 0.),
                 5.,
                 Material {
@@ -572,11 +561,11 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
                         SUN_TEXTURE.uv_pixel_from_texture(u, v)
                     })),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
             // Mercury
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(13., 0., 7.),
                 1.,
                 Material {
@@ -585,11 +574,11 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
                         MERCURY_TEXTURE.uv_pixel_from_texture(u, v)
                     })),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
             // Venera
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(13., 0., 9.),
                 1.,
                 Material {
@@ -598,11 +587,11 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
                         VENERA_TEXTURE.uv_pixel_from_texture(u, v)
                     })),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
             // Earth
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(13., 0., 11.),
                 1.,
                 Material {
@@ -611,11 +600,11 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
                         EARTH_TEXTURE.uv_pixel_from_texture(u, v)
                     })),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
             // Mars
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(13., 0., 13.),
                 1.,
                 Material {
@@ -624,11 +613,11 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
                         MARS_TEXTURE.uv_pixel_from_texture(u, v)
                     })),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
             // Jupiter
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(13., 0., 20.),
                 3.,
                 Material {
@@ -637,11 +626,11 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
                         JUPITER_TEXTURE.uv_pixel_from_texture(u, v)
                     })),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
             // Saturn
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(13., 0., 29.),
                 3.,
                 Material {
@@ -650,11 +639,11 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
                         SATURN_TEXTURE.uv_pixel_from_texture(u, v)
                     })),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
             // Uranus
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(13., 0., 36.),
                 2.,
                 Material {
@@ -663,11 +652,11 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
                         URANUS_TEXTURE.uv_pixel_from_texture(u, v)
                     })),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
+            )),
             // Neptune
-            Sphere::make(
+            Box::new(Sphere::make(
                 &Vector::make(13., 0., 42.),
                 2.,
                 Material {
@@ -676,30 +665,27 @@ pub static SCENE_J: LazyLock<Scene> = LazyLock::new(|| {
                         NEPTUNE_TEXTURE.uv_pixel_from_texture(u, v)
                     })),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            ),
-        ],
-        vec![],
-        vec![
-            Plane {
+            )),
+            Box::new(Plane {
                 point: Vector::make(5000., 0., 0.),
                 normal: Vector::make(-1., 0., 0.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(-5000., 0., 0.),
                 normal: Vector::make(1., 0., 0.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(0, 0, 0)),
                     reflectivity: None,
-                    transparency: None
+                    transparency: None,
                 },
-            },
+            }),
         ],
         vec![Light {
             position: Vector::make(900., 45., 90.),
@@ -713,74 +699,73 @@ static PEAK: LazyLock<Texture> = LazyLock::new(|| Texture::from_file("textures/p
 
 pub static PEAK_K: LazyLock<Scene> = LazyLock::new(|| {
     Scene::make(
-        vec![Sphere::make(
-            &ZERO_VECTOR,
-            1.,
-            Material {
-                color: ColorType::Function(Box::new(move |point: Vector| {
-                    let (u, v) = Texture::sphere_uv(ZERO_VECTOR, 2., point);
-                    PEAK.uv_pixel_from_texture(u, v)
-                })),
-                reflectivity: None,
-                transparency: None
-            },
-        )],
-        vec![],
         vec![
-            Plane {
+            Box::new(Sphere::make(
+                &ZERO_VECTOR,
+                1.,
+                Material {
+                    color: ColorType::Function(Box::new(move |point: Vector| {
+                        let (u, v) = Texture::sphere_uv(ZERO_VECTOR, 2., point);
+                        PEAK.uv_pixel_from_texture(u, v)
+                    })),
+                    reflectivity: None,
+                    transparency: None,
+                },
+            )),
+            Box::new(Plane {
                 point: Vector::make(3., 0., 0.),
                 normal: Vector::make(-1., 0., 0.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 150, 150)),
                     reflectivity: Some(0.8),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(-3., 0., 0.),
                 normal: Vector::make(1., 0., 0.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(150, 255, 255)),
                     reflectivity: Some(0.8),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(0., 3., 0.),
                 normal: Vector::make(0., -1., 0.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(150, 255, 150)),
                     reflectivity: Some(0.8),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(0., -3., 0.),
                 normal: Vector::make(0., 1., 0.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 150, 255)),
                     reflectivity: Some(0.8),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(0., 0., 3.),
                 normal: Vector::make(0., 0., -1.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(150, 150, 255)),
                     reflectivity: Some(0.8),
-                    transparency: None
+                    transparency: None,
                 },
-            },
-            Plane {
+            }),
+            Box::new(Plane {
                 point: Vector::make(0., 0., -3.),
                 normal: Vector::make(0., 0., 1.),
                 material: Material {
                     color: ColorType::Solid(Color::RGB(255, 255, 150)),
                     reflectivity: Some(0.8),
-                    transparency: None
+                    transparency: None,
                 },
-            },
+            }),
         ],
         vec![
             Light {

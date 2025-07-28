@@ -70,10 +70,10 @@ fn main() -> Result<(), String> {
                         camera = camera.rotate(15.0);
                     }
                     Keycode::C => {
-                        camera = camera.epic();
+                        camera = camera.reset_location();
                     }
                     Keycode::V => {
-                        camera = camera.unepic();
+                        camera = camera.reset_location_reversed();
                     }
                     _ => {}
                 }

@@ -1,11 +1,14 @@
-use crate::scene::{Collision, ColorType, Material, Plane, Scene, Sphere, Triangle};
+use crate::scene::{Collision, ColorType, Material, Scene};
 use crate::vectors::Vector;
 
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 
-
-const UP : Vector = Vector{x: 0., y: 1., z: 0.};
+const UP: Vector = Vector {
+    x: 0.,
+    y: 1.,
+    z: 0.,
+};
 
 pub struct Camera {
     // Global camera position and orientation
@@ -16,7 +19,7 @@ pub struct Camera {
 struct CameraBasis {
     // Relative orientation of the camera
     forward: Vector,
-    right: Vector
+    right: Vector,
 }
 
 impl Camera {
@@ -57,10 +60,10 @@ impl Camera {
         }
     }
 
-    pub fn unepic(&self) -> Self {
+    pub fn reset_location(&self) -> Self {
         Camera::new(Vector::make(-3.0, 0.0, 0.0), Vector::make(1.0, 0.0, 0.0))
     }
-    pub fn epic(&self) -> Self {
+    pub fn reset_location_reversed(&self) -> Self {
         Camera::new(Vector::make(3.0, 0.0, 0.0), Vector::make(-1.0, 0.0, 0.0))
     }
 
@@ -86,10 +89,7 @@ impl Camera {
     fn camera_basis(&self) -> CameraBasis {
         let forward = self.direction;
         let right = forward.cross(&UP).normalized();
-        CameraBasis {
-            forward,
-            right
-        }
+        CameraBasis { forward, right }
     }
 
     fn generate_ray(
@@ -104,8 +104,7 @@ impl Camera {
         let u = (x as f64 + 0.5) / width as f64 - 0.5;
         let v = (y as f64 + 0.5) / height as f64 - 0.5;
 
-        let direction =
-            basis.forward + basis.right * (u * 2.0 * aspect_ratio) + UP * (-v * 2.0);
+        let direction = basis.forward + basis.right * (u * 2.0 * aspect_ratio) + UP * (-v * 2.0);
 
         Ray::new(self.coords, direction)
     }
@@ -123,13 +122,16 @@ impl Camera {
         let height = (width as f64 * (y_ratio as f64 / x_ratio as f64)) as u16;
         let aspect_ratio = x_ratio as f64 / y_ratio as f64;
 
-        for y in 0..height {
+        for (_y, row) in (0..height).enumerate() {
+            println!("Rendering row {}/{}", row + 1, height);
+
             for x in 0..width {
-                let ray = self.generate_ray(x, y, width, height, aspect_ratio, &cam_basis);
-                let color = trace_color(scene, &ray, y, height, depth)
+                let ray = self.generate_ray(x, row as u16, width, height, aspect_ratio, &cam_basis);
+                let color = trace_color(scene, &ray, row as u16, height, depth)
                     .unwrap_or_else(|| background_color(ray.direction));
+
                 canvas.set_draw_color(color);
-                let _ = canvas.draw_point(sdl2::rect::Point::new(x as i32, y as i32));
+                let _ = canvas.draw_point(sdl2::rect::Point::new(x as i32, row as i32));
             }
         }
     }
@@ -140,40 +142,21 @@ fn trace_color(scene: &Scene, ray: &Ray, y: u16, height: u16, depth: u32) -> Opt
         return Some(Color::RGB(0, 0, 0)); // Max depth reached
     }
 
-    match ray.trace(scene) {
-        Some(Collision::Sphere(sphere, point)) => Some(handle_hit(
-            point,
-            sphere.normal(point, ray.direction),
-            &sphere.material,
-            scene,
-            ray,
-            y,
-            height,
-            depth,
-        )),
+    ray.trace(scene).map(|collision| {
+        let object = collision.object;
+        let point = collision.point;
 
-        Some(Collision::Triangle(triangle, point)) => Some(handle_hit(
+        handle_hit(
             point,
-            triangle.normal,
-            &triangle.material,
+            object.normal(point),
+            object.material(),
             scene,
             ray,
             y,
             height,
             depth,
-        )),
-        Some(Collision::Plane(triangle, point)) => Some(handle_hit(
-            point,
-            triangle.normal,
-            &triangle.material,
-            scene,
-            ray,
-            y,
-            height,
-            depth,
-        )),
-        None => None,
-    }
+        )
+    })
 }
 
 fn handle_hit(
@@ -197,14 +180,18 @@ fn handle_hit(
     let mut refracted = false;
     if let Some((transparency, refraction_index)) = material.transparency {
         let refraction_dir = ray.direction.refract(&normal, refraction_index);
-        let refracted_ray = Ray{origin: point_of_colision + refraction_dir * 0.001, direction: refraction_dir};
+        let refracted_ray = Ray {
+            origin: point_of_colision + refraction_dir * 0.001,
+            direction: refraction_dir,
+        };
         let refracted_color = trace_color(scene, &refracted_ray, y, height, depth);
         if refracted_color.is_none() {
             color = blend_colors(
                 base_color,
                 background_color(refracted_ray.direction),
                 brightness,
-                transparency);
+                transparency,
+            );
         } else {
             color = blend_colors(
                 base_color,
@@ -237,7 +224,11 @@ fn handle_hit(
             );
         }
         if refracted {
-            Color::RGB((color.r + display_color.r) / 2, (color.g + display_color.g) / 2, (color.b + display_color.b) / 2)
+            Color::RGB(
+                (color.r + display_color.r) / 2,
+                (color.g + display_color.g) / 2,
+                (color.b + display_color.b) / 2,
+            )
         } else {
             display_color
         }
@@ -266,34 +257,26 @@ fn blend_colors(base: Color, reflected: Color, brightness: f64, reflectivity: f6
     )
 }
 
-fn compute_lighting(scene: &Scene, point_of_colision: Vector, normal_of_hit_object: Vector) -> f64 {
+fn compute_lighting(scene: &Scene, hit_point: Vector, normal: Vector) -> f64 {
     let mut brightness = scene.ambient_light;
 
     for light in &scene.lights {
-        let light_dir = (light.position - point_of_colision).normalized();
+        let light_dir = (light.position - hit_point).normalized();
+        let light_distance = (light.position - hit_point).length();
 
-        // Pomaknjena začetna točka, da se izognemo samo-senci
-        let shadow_ray = Ray::new(point_of_colision + normal_of_hit_object * 0.001, light_dir);
-        let trace_res = &shadow_ray.trace(scene);
+        // rahlo pomaknemo začetek, da preprečimo samo-senco
+        let shadow_ray = Ray::new(hit_point + normal * 0.001, light_dir);
 
-        let light_distance = (light.position - point_of_colision).length();
-        let mut in_shadow = false;
-
-        match trace_res {
-            Some(Collision::Sphere(_, p))
-            | Some(Collision::Triangle(_, p))
-            | Some(Collision::Plane(_, p)) => {
-                let distance = (*p - point_of_colision).length();
-                if distance < light_distance {
-                    in_shadow = true;
-                }
-            }
-            _ => {}
-        }
+        let in_shadow = if let Some(collision) = shadow_ray.trace(scene) {
+            let dist = (collision.point - hit_point).length();
+            dist < light_distance
+        } else {
+            false
+        };
 
         if !in_shadow {
-            let light_contrib = normal_of_hit_object.dot(&light_dir).max(0.0) * light.intensity;
-            brightness += light_contrib;
+            let contribution = normal.dot(&light_dir).max(0.0) * light.intensity;
+            brightness += contribution;
         }
     }
 
@@ -326,111 +309,22 @@ impl Ray {
         }
     }
     pub fn trace<'a>(&'a self, scene: &'a Scene) -> Option<Collision<'a>> {
-        let mut closest: Option<(f64, Collision)> = None;
-
-        // Spheres
-        for sphere in &scene.spheres {
-            if let Some(dist) = self.sphere_hit_detection(sphere) {
-                if closest.as_ref().map_or(true, |(d, _)| dist < *d) {
-                    let hit_point = self.origin + self.direction * dist;
-                    closest = Some((dist, Collision::Sphere(sphere, hit_point)));
-                }
-            }
-        }
-
-        // Triangles
-        for triangle in &scene.triangles {
-            if let Some(dist) = self.triangle_hit_detection(triangle) {
-                if closest.as_ref().map_or(true, |(d, _)| dist < *d) {
-                    let hit_point = self.origin + self.direction * dist;
-                    closest = Some((dist, Collision::Triangle(triangle, hit_point)));
-                }
-            }
-        }
-
-        // Planes
-        for plane in &scene.planes {
-            if let Some(hit_point) = self.plane_hit_detection(plane) {
-                let dist = (hit_point - self.origin).length();
-                if closest.as_ref().map_or(true, |(d, _)| dist < *d) {
-                    closest = Some((dist, Collision::Plane(plane, hit_point)));
-                }
-            }
-        }
-
-        closest.map(|(_, collision)| collision)
-    }
-
-    pub fn plane_hit_detection(&self, plane: &Plane) -> Option<Vector> {
-        let denom = plane.normal.dot(&self.direction);
-        if denom.abs() < 1e-6 {
-            return None; // Ray je vzporeden ravnini
-        }
-
-        let t = (plane.point - self.origin).dot(&plane.normal) / denom;
-        if t > 0.0 {
-            Some(self.origin + self.direction * t)
-        } else {
-            None // Ravnina je za kamero
-        }
-    }
-
-    pub fn sphere_hit_detection(&self, sphere: &Sphere) -> Option<f64> {
-        let oc = self.origin - sphere.center;
-        /*
-        a = ||ray_dir||^2
-        b = 2 ray_dir * oc
-        c = ||oc||^2 - r^2
-
-        D = b^2 - 4ac
-        */
-        let a = self.direction.dot(&self.direction);
-        let b = 2.0 * oc.dot(&self.direction);
-        let c = oc.dot(&oc) - sphere.radius * sphere.radius;
-        let discriminant: f64 = b * b - 4.0 * a * c;
-        if discriminant <= 0.0 {
-            return None
-        }
-        
-        let sqrt_d = discriminant.sqrt();
-        let t1 = (-b - sqrt_d) / (2.0 * a);
-        let t2 = (-b + sqrt_d) / (2.0 * a);
-
-            // Vzemi najbližji pozitiven t
-        if t1 > 0.001 {
-            Some(t1)
-        } else if t2 > 0.001 {
-            Some(t2)
-        } else {
-            None
-        }
-    }
-
-    pub fn triangle_hit_detection(&self, triangle: &Triangle) -> Option<f64> {
-        // algorithm from: https://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
-
-        let (v0, v1, v2) = triangle.vertices;
-        let (e1, e2) = (v1 - v0, v2 - v0);
-        let h = self.direction.cross(&e2);
-        let a = e1.dot(&h);
-        if -0.00001 < a && a < 0.00001 {
-            return None;
-        }
-
-        let f = 1.0 / a;
-        let s = self.origin - v0;
-        let u = f * s.dot(&h);
-        if u > 1. || u < 0. {
-            return None;
-        }
-
-        let q = s.cross(&e1);
-        let v = f * self.direction.dot(&q);
-        if v < 0. || u + v > 1. {
-            return None;
-        }
-
-        let t = f * e2.dot(&q);
-        if t > 0.001 { Some(t) } else { None }
+        scene
+            .objects
+            .iter()
+            .filter_map(|obj| {
+                obj.hit(self).map(|dist| {
+                    let point = self.origin + self.direction * dist;
+                    (
+                        dist,
+                        Collision {
+                            object: &**obj,
+                            point,
+                        },
+                    )
+                })
+            })
+            .min_by(|(d1, _), (d2, _)| d1.partial_cmp(d2).unwrap())
+            .map(|(_, col)| col)
     }
 }
