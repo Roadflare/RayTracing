@@ -29,7 +29,7 @@ impl Camera {
             direction: direction.normalized(),
         }
     }
-
+    /// Relocates the camera based on the key pressed.
     pub fn relocate(self, keycode: Keycode) -> Self {
         let base = self.camera_basis();
         let mut movement = Vector {
@@ -60,13 +60,17 @@ impl Camera {
         }
     }
 
+    /// Resets the camera to its initial position and direction.
     pub fn reset_location(&self) -> Self {
         Camera::new(Vector::make(-3.0, 0.0, 0.0), Vector::make(1.0, 0.0, 0.0))
     }
+
+    /// Resets the camera to its initial position and direction, but reversed.
     pub fn reset_location_reversed(&self) -> Self {
         Camera::new(Vector::make(3.0, 0.0, 0.0), Vector::make(-1.0, 0.0, 0.0))
     }
 
+    /// Rotates the camera around the Y-axis by the specified angle in degrees.
     pub fn rotate(&self, angle_degrees: f64) -> Self {
         let angle_rad = angle_degrees.to_radians();
         let cos_theta = angle_rad.cos();
@@ -86,12 +90,14 @@ impl Camera {
         }
     }
 
+    /// Returns the camera's basis vectors for forward and right directions.
     fn camera_basis(&self) -> CameraBasis {
         let forward = self.direction;
         let right = forward.cross(&UP).normalized();
         CameraBasis { forward, right }
     }
 
+    /// Generates a ray from the camera's position through a pixel at (x, y) on the screen.
     fn generate_ray(
         &self,
         x: u16,
@@ -237,6 +243,7 @@ fn handle_hit(
     }
 }
 
+/// Applies the illumination factor to a color
 fn scale_color(color: Color, brightness: f64) -> Color {
     Color::RGB(
         (color.r as f64 * brightness).clamp(0.0, 255.0) as u8,
@@ -245,6 +252,7 @@ fn scale_color(color: Color, brightness: f64) -> Color {
     )
 }
 
+/// Blends the reflected and base colors of a point
 fn blend_colors(base: Color, reflected: Color, brightness: f64, reflectivity: f64) -> Color {
     let inv_r = 1.0 - reflectivity;
     Color::RGB(
@@ -257,6 +265,7 @@ fn blend_colors(base: Color, reflected: Color, brightness: f64, reflectivity: f6
     )
 }
 
+/// Returns the illumination of a point based on its normal, other objects and light sources in the scene
 fn compute_lighting(scene: &Scene, hit_point: Vector, normal: Vector) -> f64 {
     let mut brightness = scene.ambient_light;
 
@@ -264,7 +273,7 @@ fn compute_lighting(scene: &Scene, hit_point: Vector, normal: Vector) -> f64 {
         let light_dir = (light.position - hit_point).normalized();
         let light_distance = (light.position - hit_point).length();
 
-        // rahlo pomaknemo začetek, da preprečimo samo-senco
+        // We slightly offset the start of the shadow ray to prevent self-shadowing
         let shadow_ray = Ray::new(hit_point + normal * 0.001, light_dir);
 
         let in_shadow = if let Some(collision) = shadow_ray.trace(scene) {
@@ -283,6 +292,8 @@ fn compute_lighting(scene: &Scene, hit_point: Vector, normal: Vector) -> f64 {
     brightness.clamp(0.0, 1.0)
 }
 
+
+/// Returns a color representing the background based on the direction of the given vector.
 fn background_color(dir: Vector) -> Color {
     let t = ((dir.y + 1.0) * 0.5).clamp(0.0, 1.0);
 
@@ -308,6 +319,8 @@ impl Ray {
             direction: direction.normalized(),
         }
     }
+
+    /// Returns Some of the closest collision of the ray 'self' or None if no collision occurs.
     pub fn trace<'a>(&'a self, scene: &'a Scene) -> Option<Collision<'a>> {
         scene
             .objects
@@ -323,7 +336,7 @@ impl Ray {
                         },
                     )
                 })
-            })
+            }) // Returns an iter of collissions of 'self' with objects
             .min_by(|(d1, _), (d2, _)| d1.partial_cmp(d2).unwrap())
             .map(|(_, col)| col)
     }

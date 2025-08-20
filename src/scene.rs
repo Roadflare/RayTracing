@@ -137,7 +137,7 @@ impl Triangle {
 }
 impl Hittable for Triangle {
     fn hit(&self, ray: &Ray) -> Option<f64> {
-        // algorithm from: https://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
+        // Algorithm from: https://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 
         let (v0, v1, v2) = self.vertices;
         let (e1, e2) = (v1 - v0, v2 - v0);
@@ -180,14 +180,14 @@ impl Hittable for Plane {
     fn hit(&self, ray: &Ray) -> Option<f64> {
         let denom = self.normal.dot(&ray.direction);
         if denom.abs() < 1e-6 {
-            return None; // Ray je vzporeden ravnini
+            return None; // Ray is parallel to the plane
         }
 
         let t = (self.point - ray.origin).dot(&self.normal) / denom;
         if t > 0.0 {
             Some(ray.origin + ray.direction * t)
         } else {
-            None // Ravnina je za kamero
+            None // Plane is behind the camera
         }
         .map(|p| (p - ray.origin).length())
     }

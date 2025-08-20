@@ -15,7 +15,8 @@ impl Vector {
     pub fn length(&self) -> f64 {
         return f64::sqrt(self.x.powi(2) + self.y.powi(2) + self.z.powi(2));
     }
-
+    
+    /// Returns a normalized vector of 'self' (length 1)
     pub fn normalized(self: &Vector) -> Vector {
         let length = self.length();
         if length == 0.0 {
@@ -28,10 +29,12 @@ impl Vector {
         }
     }
 
+    /// Returns the dot product of the vectors 'self' and 'other'.
     pub fn dot(&self, other: &Vector) -> f64 {
         return self.x * other.x + self.y * other.y + self.z * other.z;
     }
 
+    /// Returns the cross product of the vectors 'self' and 'other'.
     pub fn cross(&self, other: &Vector) -> Vector {
         Vector {
             x: self.y * other.z - self.z * other.y,
@@ -39,15 +42,17 @@ impl Vector {
             z: self.x * other.y - self.y * other.x,
         }
     }
-
+    /// Returns the angle in radians between the vectors 'self' and 'other'.
     pub fn angle_with(&self, other: &Vector) -> f64 {
         f64::asin(self.normalized().dot(&other.normalized()))
     }
 
+    /// Returns the direction vector of the the ray 'self' after it is reflected off the surface with the given 'normal'.
     pub fn reflect(&self, normal: &Vector) -> Vector {
         *self - *normal * 2.0 * self.dot(normal)
     }
 
+    /// Returns the direction vector of the ray 'self' after it is refracted through a surface with the given 'normal' and 'refraction_index'.
     pub fn refract(&self, normal: &Vector, refraction_index: f64) -> Vector {
         assert!(refraction_index > 0.);
         let inciding_angle = self.angle_with(normal);
