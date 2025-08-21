@@ -176,6 +176,59 @@ fn handle_hit(
     depth: u32,
 ) -> Color {
     let brightness = compute_lighting(scene, point_of_colision, normal);
+    let base_color = match &material.color {
+        ColorType::Solid(c) => *c,
+        ColorType::Function(f) => f(point_of_colision),
+    };
+    let mut reflected_color: Option<Color> = None;
+    let mut transparency: Option<f64> = None;
+    let mut refracted_color: Option<Color> = None;
+    let mut reflectivity: Option<f64> = None;
+
+    if let Some((transparency_value, refraction_index)) = material.transparency {
+        transparency = Some(transparency_value);
+        let mut refraction_index = refraction_index;
+        if ray.direction.dot(&normal) > 0. {
+            refraction_index = 1. / refraction_index;
+        }
+        let refraction_dir = ray.direction.refract(&normal, refraction_index);
+        let refracted_ray = Ray {
+            origin: point_of_colision + refraction_dir * 0.001,
+            direction: refraction_dir,
+        };
+        refracted_color = trace_color(scene, &refracted_ray, y, height, depth - 1);
+
+        if refracted_color.is_none() {
+            refracted_color = Some(background_color(refraction_dir));
+        }
+    }
+
+    if let Some(reflectivity_value) = material.reflectivity {
+        reflectivity = Some(reflectivity_value);
+        let reflected_dir = ray.direction.reflect(&normal).normalized();
+        let reflected_ray = Ray::new(point_of_colision + normal * 0.001, reflected_dir);
+        reflected_color = trace_color(scene, &reflected_ray, y, height, depth - 1);
+        
+        if reflected_color.is_none() {
+            reflected_color = Some(background_color(reflected_dir));
+        }
+    }
+
+    blend_colors(base_color, reflected_color, refracted_color, reflectivity.unwrap_or(0.), transparency.unwrap_or(0.), brightness)
+}
+
+/*
+fn handle_hit(
+    point_of_colision: Vector,
+    normal: Vector,
+    material: &Material,
+    scene: &Scene,
+    ray: &Ray,
+    y: u16,
+    height: u16,
+    depth: u32,
+) -> Color {
+    let brightness = compute_lighting(scene, point_of_colision, normal);
 
     let base_color = match &material.color {
         ColorType::Solid(c) => *c,
@@ -242,6 +295,7 @@ fn handle_hit(
         scale_color(base_color, brightness)
     }
 }
+*/
 
 /// Applies the illumination factor to a color
 fn scale_color(color: Color, brightness: f64) -> Color {
@@ -253,16 +307,37 @@ fn scale_color(color: Color, brightness: f64) -> Color {
 }
 
 /// Blends the reflected and base colors of a point
-fn blend_colors(base: Color, reflected: Color, brightness: f64, reflectivity: f64) -> Color {
-    let inv_r = 1.0 - reflectivity;
-    Color::RGB(
-        ((base.r as f64 * brightness * inv_r + reflected.r as f64 * reflectivity).clamp(0.0, 255.0))
-            as u8,
-        ((base.g as f64 * brightness * inv_r + reflected.g as f64 * reflectivity).clamp(0.0, 255.0))
-            as u8,
-        ((base.b as f64 * brightness * inv_r + reflected.b as f64 * reflectivity).clamp(0.0, 255.0))
-            as u8,
-    )
+fn blend_colors(base: Color, reflected: Option<Color>, refracted: Option<Color>, reflectivity: f64, transparency: f64, brightness: f64) -> Color {
+    let base_color = scale_color(base, brightness);
+    match (reflected, refracted) {
+        (Some(reflected_color), Some(refracted_color)) => {
+            let transparency = transparency / 2.;
+            let reflectivity = reflectivity / 2.;
+            let base_weight = 1. - transparency - reflectivity;
+            return Color::RGB(
+                (base_color.r as f64 * base_weight + reflected_color.r as f64 * reflectivity + refracted_color.r as f64 * transparency) as u8,
+                (base_color.g as f64 * base_weight + reflected_color.g as f64 * reflectivity + refracted_color.g as f64 * transparency) as u8,
+                (base_color.b as f64 * base_weight + reflected_color.b as f64 * reflectivity + refracted_color.b as f64 * transparency) as u8,
+            );
+        }
+        (Some(reflected_color), None) => {
+            let base_weight = 1. - reflectivity;
+            return Color::RGB(
+                (base_color.r as f64 * base_weight + reflected_color.r as f64 * reflectivity) as u8,
+                (base_color.g as f64 * base_weight + reflected_color.g as f64 * reflectivity) as u8,
+                (base_color.b as f64 * base_weight + reflected_color.b as f64 * reflectivity) as u8,
+            );
+        }
+        (None, Some(refracted_color)) => {
+            let base_weight = 1. - transparency;
+            return Color::RGB(
+                (base_color.r as f64 * base_weight + refracted_color.r as f64 * transparency) as u8,
+                (base_color.g as f64 * base_weight + refracted_color.g as f64 * transparency) as u8,
+                (base_color.b as f64 * base_weight + refracted_color.b as f64 * transparency) as u8,
+            );
+        }
+        _ => return base_color,
+    }
 }
 
 /// Returns the illumination of a point based on its normal, other objects and light sources in the scene

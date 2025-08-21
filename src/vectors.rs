@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::{ops::{Add, Div, Mul, Neg, Sub}};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vector {
