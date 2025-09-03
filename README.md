@@ -53,7 +53,7 @@ Examples:
 ## Instructions
 To run the program, open the RayTracing directory in your terminal/command prompt (or the VSC terminal) and enter the command `cargo run`. This will load the first scene. There are currently 8 scenes, which you can access with the number keys `1-6` and the letter keys `H` and `J` (some of them load slowly due to a large amount of reflected rays).
 
-You can move the camera around a scene horizontally with the `WASD` keys and vertically with `Left Shift` and `Space` and rotate it with `Q` and `E`. You can move the camera to the origine position with the keys `C` and `V`, where the first makes it face in the original direction and the latter makes it face the opposite direction.
+You can move the camera around a scene horizontally with the `WASD` keys and vertically with `Left Shift` and `Space` and rotate it with `Q` and `E`. You can move the camera to the original position with the keys `C` and `V`, where the first makes it face in the original direction and the latter makes it face the opposite direction.
 
 To close the program, you may use the `ESC` key, the exit (red X) button on the window itself, or use `CTRL + C` in the terminal, that is running the program (this option counts as a force shut down and should work in the case of many commands having been entered too quickly).
 
