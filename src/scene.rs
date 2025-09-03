@@ -104,8 +104,16 @@ impl Hittable for Sphere {
         if discriminant < 0.0 {
             None
         } else {
-            let dist = (-b - discriminant.sqrt()) / (2.0 * a);
-            if dist > 0.0 { Some(dist) } else { None }
+            let root1 = (-b - discriminant.sqrt()) / (2.0 * a);
+            let root2 = (-b + discriminant.sqrt()) / (2.0 * a);
+
+            if root1 > 0.001 {
+                Some(root1)
+            } else if root2 > 0.001 {
+                Some(root2)
+            } else {
+                None
+            }
         }
     }
 
