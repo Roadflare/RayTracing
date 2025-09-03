@@ -38,6 +38,9 @@ fn main() -> Result<(), String> {
     let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
         for event in event_pump.poll_iter() {
+            if let Event::Quit{ .. } = event {
+                break 'running;
+            }
             if let Event::KeyDown {
                 keycode: Some(key), ..
             } = event
